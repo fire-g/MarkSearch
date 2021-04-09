@@ -1,7 +1,7 @@
 package client;
 
-import entity.Index;
-import entity.MarkDoc;
+import index.subject.Index;
+import index.subject.MarkDoc;
 import index.service.SearchService;
 import index.service.WriterService;
 import register.entity.IndexNode;

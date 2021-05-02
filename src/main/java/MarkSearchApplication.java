@@ -161,7 +161,7 @@ public class MarkSearchApplication {
         if(Constant.client){
             server.register(ClientServiceImpl.class);
             //客户端注册
-            Pool.execute(new ClientRegister(new ClientNode(Constant.ip,Constant.port),regNode));
+//            Pool.execute(new ClientRegister(new ClientNode(Constant.ip,Constant.port),regNode));
         }
     }
 }

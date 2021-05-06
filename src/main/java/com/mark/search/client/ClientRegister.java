@@ -33,7 +33,7 @@ public class ClientRegister implements Runnable{
             ClientFactory.addNodes(nodes);
             //发送心跳包
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

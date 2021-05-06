@@ -51,7 +51,7 @@ public class IndexRegister implements Runnable {
         while (Constant.index) {
             //发送心跳包
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -1,7 +1,6 @@
 package com.mark.search.index.subject;
 
 
-
 import com.mark.search.index.annotation.Search;
 
 import java.io.Serializable;
@@ -9,6 +8,7 @@ import java.util.Date;
 
 /**
  * 所有索引的父类
+ *
  * @author HaoTian
  */
 public class Index implements Serializable {
@@ -18,14 +18,14 @@ public class Index implements Serializable {
     @Search(value = "docId")
     private int docId;
 
-    public Index(){
-        this.time=new Date();
+    public Index() {
+        this.time = new Date();
     }
 
     /**
      * 索引建立日期
      */
-    @Search(value = "date",store = true,index = true)
+    @Search(value = "date", store = true, index = true)
     private Date time;
 
     public final float getScore() {

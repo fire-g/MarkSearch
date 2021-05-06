@@ -15,10 +15,7 @@ import com.mark.search.util.Constant;
 import com.mark.search.util.Util;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 启动流程
@@ -28,6 +25,11 @@ import java.util.Properties;
  * @author HaoTian
  */
 public class MarkSearchApplication {
+    private final String[] args;
+
+    public MarkSearchApplication(String[] args){
+        this.args=args;
+    }
 
     /**
      * 类路径集合
@@ -44,7 +46,9 @@ public class MarkSearchApplication {
      */
     private final List<Class<?>> services = new ArrayList<>();
 
-    public void run() {
+    public void run() throws IOException {
+        //解析参数
+        argsConfig();
         //获取包
         Package p = this.getClass().getPackage();
         //通过包遍历类
@@ -55,6 +59,9 @@ public class MarkSearchApplication {
         }
         //获取服务
         searchService();
+        //开启HTTP服务
+        HttpServer httpServer = new HttpServer(Constant.http,searchController());
+        Pool.execute(httpServer);
         //生成RPC服务对象
         Server server = new ServerImpl(Constant.port);
         Constant.rpcServer = server;
@@ -75,6 +82,19 @@ public class MarkSearchApplication {
                 }
             }
         }
+    }
+
+    public Class<?>[] searchController(){
+        List<Class<?>> cla = new ArrayList<>();
+        for (Class<?> clazz : classes) {
+            if (!clazz.isInterface()) {
+                if (clazz.getAnnotation(com.mark.search.annotation.Controller.class) != null) {
+                    System.out.println(clazz.getName());
+                    cla.add(clazz);
+                }
+            }
+        }
+        return cla.toArray(new Class<?>[0]);
     }
 
     /**
@@ -124,72 +144,24 @@ public class MarkSearchApplication {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        RegNode regNode = null;
-        //是否作为起始结点
-        //true 表示是起始结点
-        //false 表示不是起始结点，是作为边隅结点加入核心系统
-        Boolean m = null;
-        //处理输入参数
-        //-status 将程序作为什么类型的服务
-        // main:将程序作为主服务
-        // member:将程序作为成员服务，需要--register参数获取已经在运行的注册中心服务
-        //-as 将程序作为什么服务器启动,可同时运行多个，默认是启动一个完整的服务体系，即全部启动
-        // register:将程序作为注册服务器启动
-        // index:将程序作为索引服务器启动
-        // client:将程序作为客户端启动
-        //-port 服务器监听运行的端口,当前版本只作为客户端不需要监听
-        if (args.length > 0) {
-            for (int i = 0; i < args.length; i++) {
-                switch (args[i]) {
-                    case "-status":
-                        String status = args[i + 1];
-                        if ("main".equals(status)) {
-                            m = true;
-                        } else if ("member".equals(status)) {
-                            m = false;
-                        }
-                        i++;
-                        break;
-                    case "-as":
-                        String ss = args[i + 1];
-                        String[] str = ss.split("\\|");
-                        for (String s : str) {
-                            if ("com/mark/search/register".equals(s)) {
-                                Constant.register = true;
-                            } else if ("com/mark/search/index".equals(s)) {
-                                Constant.index = true;
-                            } else if ("com/mark/search/client".equals(s)) {
-                                Constant.client = true;
-                            }
-                        }
-                        i++;
-                        break;
-                    case "-port":
-                        int port = Integer.parseInt(args[i + 1]);
-                        Constant.port = port;
-                        System.out.println(port);
-                        i++;
-                        break;
-                    case "-register":
-                        //如果未设置
-                        if (m != null && !m) {
-                            String[] o = args[i + 1].split(":");
-                            String ip = o[0];
-                            int po = Integer.parseInt(o[1]);
-                            regNode = new RegNode(ip, po, 0);
-                        }
-                        break;
-                    default:
-                        System.out.println("无法识别的指令：" + args[i]);
-                        break;
-                }
+    private void argsConfig(){
+        //获取本机ip
+        Constant.ip = Util.getAddress();
+        //将参数存入Map
+        Map<String,String> argMap=new HashMap<>();
+
+        if(args.length>0){
+            for(int i=0;i<args.length;i++){
+                argMap.put(args[i],args[i+1]);
+                i++;
             }
+        }else {
+            Constant.regNode= new RegNode(Constant.ip,Constant.port,0);
         }
 
-        //开启HTTP服务
-        HttpServer httpServer = new HttpServer();
-        Pool.execute(httpServer);
+    }
+
+    private void config() throws IOException {
         File config = new File("./config.properties");
         //加载配置文件
         try {
@@ -211,17 +183,84 @@ public class MarkSearchApplication {
             e.printStackTrace();
         }
 
-        Constant.ip = Util.getAddress();
+
         System.out.println("获取本机ip:" + Constant.ip);
 
         //如果配置本机未结点中心
         //则添加本机为注册中心
-        if (m == null || m) {
-            //添加注册中心
-            regNode = new RegNode(Constant.ip, Constant.port, 0);
-        }
-        Constant.regNode = regNode;
-        new MarkSearchApplication().run();
+//        if (m == null || m) {
+//            //添加注册中心
+//            regNode = new RegNode(Constant.ip, Constant.port, 0);
+//        }
+//        Constant.regNode = regNode;
+    }
+
+    public static void main(String[] args) throws IOException {
+        RegNode regNode = null;
+        //是否作为起始结点
+        //true 表示是起始结点
+        //false 表示不是起始结点，是作为边隅结点加入核心系统
+        Boolean m = null;
+        //处理输入参数
+        //-status 将程序作为什么类型的服务
+        // main:将程序作为主服务
+        // member:将程序作为成员服务，需要--register参数获取已经在运行的注册中心服务
+        //-as 将程序作为什么服务器启动,可同时运行多个，默认是启动一个完整的服务体系，即全部启动
+        // register:将程序作为注册服务器启动
+        // index:将程序作为索引服务器启动
+        // client:将程序作为客户端启动
+        //-port 服务器监听运行的端口,当前版本只作为客户端不需要监听
+//        if (args.length > 0) {
+//            for (int i = 0; i < args.length; i++) {
+//                switch (args[i]) {
+//                    case "-status":
+//                        String status = args[i + 1];
+//                        if ("main".equals(status)) {
+//                            m = true;
+//                        } else if ("member".equals(status)) {
+//                            m = false;
+//                        }
+//                        i++;
+//                        break;
+//                    case "-as":
+//                        String ss = args[i + 1];
+//                        String[] str = ss.split("\\|");
+//                        for (String s : str) {
+//                            if ("com/mark/search/register".equals(s)) {
+//                                Constant.register = true;
+//                            } else if ("com/mark/search/index".equals(s)) {
+//                                Constant.index = true;
+//                            } else if ("com/mark/search/client".equals(s)) {
+//                                Constant.client = true;
+//                            }
+//                        }
+//                        i++;
+//                        break;
+//                    case "-port":
+//                        int port = Integer.parseInt(args[i + 1]);
+//                        Constant.port = port;
+//                        System.out.println(port);
+//                        i++;
+//                        break;
+//                    case "-register":
+//                        //如果未设置
+//                        if (m != null && !m) {
+//                            String[] o = args[i + 1].split(":");
+//                            String ip = o[0];
+//                            int po = Integer.parseInt(o[1]);
+//                            regNode = new RegNode(ip, po, 0);
+//                        }
+//                        break;
+//                    default:
+//                        System.out.println("无法识别的指令：" + args[i]);
+//                        break;
+//                }
+//            }
+//        }
+
+
+
+        new MarkSearchApplication(args).run();
     }
 
     /**

@@ -4,6 +4,7 @@ package com.mark.search.register.entity;
  * 服务器的node存储模型
  * 在注册服务的存储结构中依然以Node作为同一服务器的判断
  * 故在注册服务的存储结构中不需要重写equals方法
+ *
  * @author haotian
  */
 public class ServerIndexNode extends IndexNode {
@@ -18,11 +19,11 @@ public class ServerIndexNode extends IndexNode {
      */
     private long flushTime;
 
-    public ServerIndexNode(IndexNode indexNode){
+    public ServerIndexNode(IndexNode indexNode) {
         super(indexNode.getId(), indexNode.getIp(), indexNode.getPort());
         long t = System.currentTimeMillis();
-        registerTime =t;
-        flushTime =t;
+        registerTime = t;
+        flushTime = t;
     }
 
     public ServerIndexNode(int id, String ip, int port) {
@@ -57,7 +58,7 @@ public class ServerIndexNode extends IndexNode {
 
     @Override
     public String toString() {
-        return "ServerNode{" + super.toString()+
+        return "ServerNode{" + super.toString() +
                 ",registerTime=" + registerTime +
                 ", flushTime=" + flushTime +
                 '}';

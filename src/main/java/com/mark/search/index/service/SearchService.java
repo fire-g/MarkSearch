@@ -11,6 +11,7 @@ import java.util.Map;
 public interface SearchService {
     /**
      * 获取所有的
+     *
      * @param query query
      * @return 所有满足条件的返回值
      */
@@ -18,8 +19,9 @@ public interface SearchService {
 
     /**
      * 获取文档
+     *
      * @param docs 文档id
      * @return document
      */
-    List<Map<String,Object>> getDocument(MarkDoc[] docs);
+    List<Map<String, Object>> getDocument(MarkDoc[] docs);
 }

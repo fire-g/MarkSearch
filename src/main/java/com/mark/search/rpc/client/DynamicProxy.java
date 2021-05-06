@@ -2,6 +2,7 @@ package com.mark.search.rpc.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mark.search.rpc.RemoteService;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,23 +29,31 @@ public class DynamicProxy implements InvocationHandler {
         }
     }
 
-    public DynamicProxy(Object obj){
-        this(obj,new InetSocketAddress("localhost",8088));
+    public DynamicProxy(Object obj) {
+        this(obj, new InetSocketAddress("localhost", 8088));
     }
 
-    public  DynamicProxy(Object obj,InetSocketAddress address){
-        this.obj=obj;
-        this.address=address;
+    public DynamicProxy(Object obj, InetSocketAddress address) {
+        this.obj = obj;
+        this.address = address;
     }
 
-    public DynamicProxy(Object obj, String host, int port){
-        this(obj,new InetSocketAddress(host,port));
+    public DynamicProxy(Object obj, String host, int port) {
+        this(obj, new InetSocketAddress(host, port));
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         connect();
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+        RemoteService remoteService = new RemoteService();
+        remoteService.setService(((Class<?>) obj).getName());
+        remoteService.setMethod(method.getName());
+        remoteService.setArguments(args);
+        remoteService.setParameters(method.getParameterTypes());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(remoteService);
         output.writeUTF(((Class<?>) obj).getName());
         output.writeUTF(method.getName());
         if (socket.isClosed()) {
@@ -53,8 +62,6 @@ public class DynamicProxy implements InvocationHandler {
         output.writeObject(method.getParameterTypes());
         output.writeObject(args);
         InputStreamReader reader = new InputStreamReader(socket.getInputStream());
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper.readValue(reader, method.getReturnType());
     }
 }

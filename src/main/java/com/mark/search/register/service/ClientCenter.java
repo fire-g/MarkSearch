@@ -9,6 +9,7 @@ public interface ClientCenter {
 
     /**
      * 客户端注册
+     *
      * @param node 客户端
      * @return 操作结果
      */
@@ -16,6 +17,7 @@ public interface ClientCenter {
 
     /**
      * 获取所有客户端
+     *
      * @return 客户端列表
      */
     ClientNode[] list();

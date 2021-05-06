@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 注册中心地址实体
+ *
  * @author haotian
  */
 @JsonIgnoreProperties
-public class RegNode extends Node{
+public class RegNode extends Node {
     /**
      * 结点状态
      * -1 死亡
@@ -21,7 +22,7 @@ public class RegNode extends Node{
     public RegNode(String ip, int port, int status) {
         super(ip, port);
         this.status = status;
-        master=true;
+        master = true;
     }
 
     public boolean isMaster() {

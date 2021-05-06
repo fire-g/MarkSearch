@@ -6,6 +6,7 @@ import com.mark.search.rpc.server.Server;
 
 /**
  * 程序公共参数
+ *
  * @author haotian
  */
 public class Constant {
@@ -30,7 +31,7 @@ public class Constant {
     public static int port = 8088;
 
     /**
-     *Client监听的HTTP端口
+     * Client监听的HTTP端口
      */
     public static int http = 8080;
 
@@ -47,17 +48,17 @@ public class Constant {
     /**
      * 是否是索引服务id为@{indexNode}的主结点
      */
-    public static boolean indexMaster=true;
+    public static boolean indexMaster = true;
 
-    public static RegNode regNode=null;
+    public static RegNode regNode = null;
 
     /**
      * HTTP服务线程
      */
-    public static HttpServer server=null;
+    public static HttpServer server = null;
 
     /**
      * 提供RPC服务
      */
-    public static Server rpcServer=null;
+    public static Server rpcServer = null;
 }

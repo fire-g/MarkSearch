@@ -6,24 +6,25 @@ import java.util.Map;
 
 /**
  * 服务工厂
+ *
  * @author haotian
  */
 public class ServiceFactory {
-    private static final Map<String,Object> map=new HashMap<>();
+    private static final Map<String, Object> map = new HashMap<>();
 
-    public static <T> T newInstance(Class<T> clazz){
+    public static <T> T newInstance(Class<T> clazz) {
         String name = clazz.getName();
-        if(map.containsKey(name)){
-            Object o=map.get(name);
-            T obj=null;
-            if(o != null){
-                obj=(T)o;
+        if (map.containsKey(name)) {
+            Object o = map.get(name);
+            T obj = null;
+            if (o != null) {
+                obj = (T) o;
             }
             return obj;
         }
         try {
             T obj = clazz.newInstance();
-            map.put(name,obj);
+            map.put(name, obj);
             return obj;
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

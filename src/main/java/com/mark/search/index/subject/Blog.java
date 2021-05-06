@@ -9,16 +9,16 @@ import java.util.Objects;
 /**
  * @author HaoTian
  */
-public class Blog extends Normal{
+public class Blog extends Normal {
 
-    public Blog(){
+    public Blog() {
         this.setType("blog");
     }
 
-    @Search(value = "author",store = true,index = true)
+    @Search(value = "author", store = true, index = true)
     private String author;
 
-    @Search(value="post",store = true,index = true)
+    @Search(value = "post", store = true, index = true)
     private Date post;
 
     public final String getAuthor() {
@@ -30,14 +30,14 @@ public class Blog extends Normal{
     }
 
     public final Date getPost() {
-        if(post!=null) {
+        if (post != null) {
             return (Date) post.clone();
         }
         return null;
     }
 
     public final void setPost(Date post) {
-        this.post = (Date)post.clone();
+        this.post = (Date) post.clone();
     }
 
     @Override

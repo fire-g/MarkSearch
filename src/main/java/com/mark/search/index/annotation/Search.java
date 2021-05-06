@@ -6,16 +6,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 索引注解,用于标注实体是否分词、是否存储、是否索引以及标识索引片名称
+ *
  * @author HaoTian
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Search {
-    String value();//field name
+    //field name
+    String value();
 
-    boolean participle() default false;//是否分词
+    //是否分词
+    boolean participle() default false;
 
-    boolean store() default false;//是否存储
+    //是否存储
+    boolean store() default false;
 
-    boolean index() default false;//是否索引
+    //是否索引
+    boolean index() default false;
 }

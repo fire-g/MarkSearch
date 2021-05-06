@@ -16,6 +16,7 @@ import java.util.Arrays;
  * 2、获取所有注册中心
  * 3、随机选取一个注册中心
  * 4、发送心跳包
+ *
  * @author haotian
  */
 public class IndexRegister implements Runnable {
@@ -24,7 +25,7 @@ public class IndexRegister implements Runnable {
 
     public IndexRegister(IndexNode indexNode, RegNode regNode) {
         this.indexNode = indexNode;
-        this.regNode=regNode;
+        this.regNode = regNode;
     }
 
     @Override
@@ -38,13 +39,13 @@ public class IndexRegister implements Runnable {
         //
         System.out.println("注册中心:" + regNode.getIp() + ":" + regNode.getPort() + "正常...");
         //获取所有注册中心
-        RegNode[] regNodes=register.list();
+        RegNode[] regNodes = register.list();
         //2、开始心跳发送
         final IndexCenter center = Client.getRemoteProxyObj(IndexCenter.class, regNode.getIp(), regNode.getPort());
         //注册服务
         //当配置文件里面的indexNode!=-1时
         IndexNode indexNode = center.register(Constant.ip, Constant.port);
-        Constant.indexNode= indexNode.getId();
+        Constant.indexNode = indexNode.getId();
 
         //心跳发送
         while (Constant.index) {

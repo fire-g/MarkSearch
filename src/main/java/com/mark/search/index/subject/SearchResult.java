@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * 搜索结果
+ *
  * @author HaoTian
  */
 public class SearchResult implements Serializable {

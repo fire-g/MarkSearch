@@ -7,44 +7,46 @@ import java.util.Objects;
 
 /**
  * 常规索引类型，包含
+ *
  * @author HaoTian
  */
 public class Normal extends Index {
 
-    public Normal(){
-        this.type="normal";
+    public Normal() {
+        this.type = "normal";
     }
+
     /**
      * 索引类型(存储、索引)
      */
-    @Search(value = "type",store = true,index = true)
+    @Search(value = "type", store = true, index = true)
     private String type;
 
     /**
      * 文件url(不分词、索引、存储)
      */
-    @Search(value = "url",store = true,index = true)
+    @Search(value = "url", store = true, index = true)
     private String url;
 
-    @Search(value = "title",store = true,index = true,participle = true)
+    @Search(value = "title", store = true, index = true, participle = true)
     private String title;
 
     /**
-     *用于索引
+     * 用于索引
      */
-    @Search(value = "content",participle = true,index = true)
+    @Search(value = "content", participle = true, index = true)
     private String content;
 
     /**
      * 简介(存储、索引)
      */
-    @Search(value = "synopsis",participle = true,store = true,index = true)
+    @Search(value = "synopsis", participle = true, store = true, index = true)
     private String synopsis;
 
     /**
      * (不分词、索引、存储)
      */
-    @Search(value = "host",store = true,index = true)
+    @Search(value = "host", store = true, index = true)
     private String host;
 
     public final String getType() {
@@ -94,7 +96,6 @@ public class Normal extends Index {
     public final void setHost(String host) {
         this.host = host;
     }
-
 
 
     @Override

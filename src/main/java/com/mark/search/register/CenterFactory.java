@@ -10,6 +10,7 @@ import java.util.*;
 /**
  * 存储注册列表
  * 所有节点数据都
+ *
  * @author haotian
  */
 public class CenterFactory {

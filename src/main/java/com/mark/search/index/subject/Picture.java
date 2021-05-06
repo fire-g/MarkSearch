@@ -7,49 +7,49 @@ import com.mark.search.index.annotation.Search;
  * @author HaoTian
  */
 public class Picture extends Index {
-    @Search(value = "a",index = true)
+    @Search(value = "a", index = true)
     private Short a;
 
-    @Search(value = "b",index = true)
+    @Search(value = "b", index = true)
     private Short b;
 
-    @Search(value = "c",index = true)
+    @Search(value = "c", index = true)
     private Short c;
 
-    @Search(value = "d",index = true)
+    @Search(value = "d", index = true)
     private Short d;
 
-    @Search(value = "e",index = true)
+    @Search(value = "e", index = true)
     private Short e;
 
-    @Search(value = "f",index = true)
+    @Search(value = "f", index = true)
     private Short f;
 
-    @Search(value = "g",index = true)
+    @Search(value = "g", index = true)
     private Short g;
 
-    @Search(value = "h",index = true)
+    @Search(value = "h", index = true)
     private Short h;
 
-    @Search(value = "url",index = true,store = true)
+    @Search(value = "url", index = true, store = true)
     private String url;
 
     /**
      * SimHash
      */
-    @Search(value = "sim_hash",store = true,index = true)
+    @Search(value = "sim_hash", store = true, index = true)
     private String simHash;
 
     /**
      * 文件摘要
      */
-    @Search(value = "hash",store = true,index = true)
+    @Search(value = "hash", store = true, index = true)
     private String sha;
 
     /**
      * 图片存储地址
      */
-    @Search(value = "address",index = true,store = true)
+    @Search(value = "address", index = true, store = true)
     private String address;
 
     public final String getSimHash() {

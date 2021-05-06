@@ -70,7 +70,7 @@ public class SearchServiceImpl implements SearchService {
             try {
                 Document document = searcher.doc(i.doc);
                 m.put("score", i.score);
-                m.put("id", Util.combineInt2Long(i.doc,i.node));
+                m.put("id", Util.combineInt2Long(i.doc, i.node));
                 for (IndexableField field : document.getFields()) {
                     String s = field.stringValue();
                     if (s != null) {

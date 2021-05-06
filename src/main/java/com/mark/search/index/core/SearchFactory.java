@@ -16,8 +16,8 @@ public class SearchFactory {
         initReader();
     }
 
-    public static void initReader(){
-        Directory directory= DirectoryFactory.getDirectory();
+    public static void initReader() {
+        Directory directory = DirectoryFactory.getDirectory();
         try {
             searcher = new IndexSearcher(DirectoryReader.open(directory));
         } catch (IOException e) {
@@ -25,7 +25,7 @@ public class SearchFactory {
         }
     }
 
-    public static IndexSearcher getSearcher(){
+    public static IndexSearcher getSearcher() {
         return searcher;
     }
 }

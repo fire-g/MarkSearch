@@ -8,31 +8,31 @@ import java.util.Objects;
 /**
  * @author HaoTian
  */
-public class Question extends Index{
+public class Question extends Index {
 
-    public Question(){
-        this.type="question";
+    public Question() {
+        this.type = "question";
     }
 
     /**
      * 索引类型(存储、索引)
      */
-    @Search(value = "type",store = true)
+    @Search(value = "type", store = true)
     private String type;
 
     /**
      * 文件url(不分词、索引、存储)
      */
-    @Search(value = "url",store = true,index = true)
+    @Search(value = "url", store = true, index = true)
     private String url;
 
-    @Search(value = "title",participle = true,store = true,index = true)
+    @Search(value = "title", participle = true, store = true, index = true)
     private String title;
 
     /**
      * (不分词、索引、存储)
      */
-    @Search(value = "host",store = true,index = true)
+    @Search(value = "host", store = true, index = true)
     private String host;
 
     public final String getType() {

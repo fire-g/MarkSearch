@@ -5,6 +5,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * 处理get方法
+ *
  * @author HaoTian
  */
 @Retention(RetentionPolicy.RUNTIME)

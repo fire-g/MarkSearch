@@ -17,11 +17,11 @@ public class Pool {
             5, 200, 0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(1024), new ThreadPoolExecutor.AbortPolicy());
 
-    public static void shutdown(){
+    public static void shutdown() {
         EXECUTOR_SERVICE.shutdown();
     }
 
-    public static void execute(Runnable runnable){
+    public static void execute(Runnable runnable) {
         EXECUTOR_SERVICE.execute(runnable);
     }
 }

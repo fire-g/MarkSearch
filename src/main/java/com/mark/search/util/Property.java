@@ -5,13 +5,15 @@ import java.util.Properties;
 
 /**
  * 配置文件
+ *
  * @author haotian
  */
 public class Property {
     private File file;
     private Properties properties;
-    public Property(){
-        file=new File("./config.properties");
+
+    public Property() {
+        file = new File("./config.properties");
         try {
             properties.load(new FileInputStream(file));
         } catch (IOException e) {
@@ -19,9 +21,9 @@ public class Property {
         }
     }
 
-    public Property(String f){
-        file=new File(f);
-        if(!file.exists()){
+    public Property(String f) {
+        file = new File(f);
+        if (!file.exists()) {
             System.out.println("配置文件不存在");
         }
         try {
@@ -31,14 +33,14 @@ public class Property {
         }
     }
 
-    public void ReadProperty(){
+    public void ReadProperty() {
 
     }
 
-    public void saveProperty(){
+    public void saveProperty() {
         try {
-            OutputStream stream=new FileOutputStream(file);
-            properties.store(stream,"utf-8");
+            OutputStream stream = new FileOutputStream(file);
+            properties.store(stream, "utf-8");
         } catch (IOException e) {
             e.printStackTrace();
         }

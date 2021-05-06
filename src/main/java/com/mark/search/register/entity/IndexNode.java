@@ -26,14 +26,14 @@ public class IndexNode extends Node {
      */
     private boolean master;
 
-    public IndexNode(){
+    public IndexNode() {
 
     }
 
     public IndexNode(int id, String ip, int port) {
         super(ip, port);
         this.id = id;
-        master=true;
+        master = true;
     }
 
     public boolean isMaster() {
@@ -74,7 +74,7 @@ public class IndexNode extends Node {
     public String toString() {
         return "Node{" +
                 "id=" + id +
-                ", "+super.toString()+
+                ", " + super.toString() +
                 ", status=" + status +
                 ", master=" + master +
                 '}';

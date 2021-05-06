@@ -25,7 +25,7 @@ public class ServerImpl implements Server {
 
     @Override
     public void stop() {
-        if(!server.isClosed()) {
+        if (!server.isClosed()) {
             try {
                 server.close();
             } catch (IOException e) {

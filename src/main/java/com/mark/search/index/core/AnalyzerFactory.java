@@ -10,8 +10,8 @@ public class AnalyzerFactory {
         initAnalyzer();
     }
 
-    public static void initAnalyzer(){
-        analyzer=new StandardAnalyzer();
+    public static void initAnalyzer() {
+        analyzer = new StandardAnalyzer();
     }
 
     public static Analyzer getAnalyzer() {

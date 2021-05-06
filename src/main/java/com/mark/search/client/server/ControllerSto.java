@@ -2,6 +2,7 @@ package com.mark.search.client.server;
 
 /**
  * 存储路由绑定数据
+ *
  * @author HaoTian
  */
 public class ControllerSto {

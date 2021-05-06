@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 标识服务的注解
  * 只能用于标识类
+ *
  * @author HaoTian
  */
 @Target(ElementType.TYPE)

@@ -3,7 +3,7 @@ package com.mark.search.register.entity;
 /**
  * @author haotian
  */
-public class ServerRegNode extends RegNode{
+public class ServerRegNode extends RegNode {
     /**
      * 注册时间
      */
@@ -14,11 +14,11 @@ public class ServerRegNode extends RegNode{
      */
     private long flushTime;
 
-    public ServerRegNode(RegNode node){
-        super(node.getIp(),node.getPort(),node.getStatus());
+    public ServerRegNode(RegNode node) {
+        super(node.getIp(), node.getPort(), node.getStatus());
         long l = System.currentTimeMillis();
-        registerTime=l;
-        flushTime=l;
+        registerTime = l;
+        flushTime = l;
     }
 
     public long getRegisterTime() {

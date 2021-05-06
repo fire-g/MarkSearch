@@ -12,7 +12,7 @@ import com.mark.search.register.service.ClientCenter;
 public class ClientCenterImpl implements ClientCenter {
 
     @Override
-    public boolean register(ClientNode node){
+    public boolean register(ClientNode node) {
         CenterFactory.regClient(node);
         return true;
     }

@@ -4,6 +4,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,30 +61,16 @@ public class SocketRunnable implements Runnable {
                     //获取路由
                     String condition = requestHeader.substring(begin, end);
                     //处理路由
-                    String[] conditions = condition.split("\\?");
-                    if(conditions.length==2) {
-                        String[] m = conditions[1].split("&");
-                        for (String s : m) {
-                            String[] ss = s.split("=");
-                            obj.put(ss[0],ss[1]);
-                        }
-                    }
+                    String[] conditions = getStrings(obj, condition);
                     sto=findGetByPath(conditions[0]);
                 }else if(requestHeader.startsWith("POST")){
-                    int begin = requestHeader.indexOf("GET") + 6;
+                    int begin = requestHeader.indexOf("POST") + 6;
                     int end = requestHeader.indexOf("HTTP/") - 1;
                     //获取路由
                     String condition = requestHeader.substring(begin, end);
                     System.out.println("POST参数:"+condition);
                     //处理路由
-                    String[] conditions = condition.split("\\?");
-                    if(conditions.length==2) {
-                        String[] m = conditions[1].split("&");
-                        for (String s : m) {
-                            String[] ss = s.split("=");
-                            obj.put(ss[0],ss[1]);
-                        }
-                    }
+                    String[] conditions = getStrings(obj, condition);
                     sto= findPostByPath(conditions[0]);
                 }
                 //获得POST参数
@@ -143,5 +130,25 @@ public class SocketRunnable implements Runnable {
         } catch (IOException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 提取参数
+     * @param obj
+     * @param condition
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private String[] getStrings(Map<String, Object> obj, String condition) throws UnsupportedEncodingException {
+        String[] conditions = condition.split("\\?");
+        if (conditions.length == 2) {
+            String[] m = conditions[1].split("&");
+            for (String s : m) {
+                String[] ss = s.split("=");
+                String ab = URLDecoder.decode(ss[1], "utf-8");
+                obj.put(ss[0], ab);
+            }
+        }
+        return conditions;
     }
 }

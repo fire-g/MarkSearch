@@ -5,7 +5,6 @@ import com.mark.search.annotation.POST;
 import com.mark.search.pool.Pool;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,6 +12,7 @@ import java.util.Map;
 
 /**
  * 一个简易的HTTP服务提供程序
+ *
  * @author HaoTian
  */
 public class HttpServer implements Runnable {
@@ -22,11 +22,11 @@ public class HttpServer implements Runnable {
         ss = new ServerSocket(8080);
     }
 
-    public HttpServer(int port,Class<?>[] classes) throws IOException{
+    public HttpServer(int port, Class<?>[] classes) throws IOException {
         ss = new ServerSocket(port);
         //通过注解提取处理方法
         //注册路由
-        for(Class<?> clazz:classes){
+        for (Class<?> clazz : classes) {
             Object o;
             try {
                 o = clazz.newInstance();
@@ -36,9 +36,9 @@ public class HttpServer implements Runnable {
             }
             //获取方法
             Method[] methods = clazz.getMethods();
-            for(Method method:methods){
+            for (Method method : methods) {
                 GET get = method.getAnnotation(GET.class);
-                if(get!=null){
+                if (get != null) {
                     String path = get.path();
                     ControllerSto sto = new ControllerSto();
                     sto.setPath(path);
@@ -47,11 +47,11 @@ public class HttpServer implements Runnable {
                     sto.setMethodName(method.getName());
                     //查看参数
                     Class<?>[] parameterTypes = method.getParameterTypes();
-                    for(Class<?> cl:parameterTypes){
-                        if(cl== StringBuilder.class){
+                    for (Class<?> cl : parameterTypes) {
+                        if (cl == StringBuilder.class) {
                             sto.setBody(true);
                         }
-                        if(cl == Map.class){
+                        if (cl == Map.class) {
                             sto.setMap(true);
                         }
                     }
@@ -59,7 +59,7 @@ public class HttpServer implements Runnable {
                     continue;
                 }
                 POST post = method.getAnnotation(POST.class);
-                if(post!=null){
+                if (post != null) {
                     String path = post.path();
                     ControllerSto sto = new ControllerSto();
                     sto.setPath(path);
@@ -69,11 +69,11 @@ public class HttpServer implements Runnable {
 
                     //查看参数
                     Class<?>[] parameterTypes = method.getParameterTypes();
-                    for(Class<?> cl:parameterTypes){
-                        if(cl== StringBuilder.class){
+                    for (Class<?> cl : parameterTypes) {
+                        if (cl == StringBuilder.class) {
                             sto.setBody(true);
                         }
-                        if(cl == Map.class){
+                        if (cl == Map.class) {
                             sto.setMap(true);
                         }
                     }
@@ -94,7 +94,7 @@ public class HttpServer implements Runnable {
             while (!ss.isClosed()) {
                 Socket socket = ss.accept();
                 //HTTP连接处理程序
-                SocketRunnable socketRunnable=new SocketRunnable(socket);
+                SocketRunnable socketRunnable = new SocketRunnable(socket);
                 Pool.execute(socketRunnable);
             }
         } catch (IOException e) {

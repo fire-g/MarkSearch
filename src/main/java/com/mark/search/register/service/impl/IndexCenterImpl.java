@@ -10,6 +10,7 @@ import java.util.Random;
 
 /**
  * 索引库注册中心管理服务
+ *
  * @author haotian
  */
 @Service(name = "register")
@@ -34,8 +35,8 @@ public class IndexCenterImpl implements IndexCenter {
     @Override
     public IndexNode register(String ip, int port) {
         //默认分布式扩展
-        Random random=new Random();
-        ServerIndexNode node=new ServerIndexNode(new IndexNode(random.nextInt(),ip,port));
+        Random random = new Random();
+        ServerIndexNode node = new ServerIndexNode(new IndexNode(random.nextInt(), ip, port));
         CenterFactory.regNodes(node);
         return node;
     }

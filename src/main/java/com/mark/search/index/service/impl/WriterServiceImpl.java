@@ -22,7 +22,7 @@ import java.util.List;
 @Service(name = "index")
 public class WriterServiceImpl implements WriterService {
 
-    private IndexWriter writer;
+    private final IndexWriter writer;
 
     @Inject
     private Logger logger;

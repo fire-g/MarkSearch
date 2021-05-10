@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
  *
  * @author HaoTian
  */
+@Single
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Service {

@@ -1,17 +1,12 @@
 package com.mark.search.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * 控制层
- *
+ * 表明创建单例
  * @author HaoTian
  */
-@Single
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Controller {
+public @interface Single {
 }

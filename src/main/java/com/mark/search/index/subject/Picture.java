@@ -124,7 +124,7 @@ public class Picture extends Index {
         this.h = h;
     }
 
-    public String getUrl() {
+    public final String getUrl() {
         return url;
     }
 

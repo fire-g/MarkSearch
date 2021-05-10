@@ -16,19 +16,19 @@ public class Node implements Serializable {
      */
     private int port;
 
-    public String getIp() {
+    public final String getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public final void setIp(String ip) {
         this.ip = ip;
     }
 
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    public final void setPort(int port) {
         this.port = port;
     }
 

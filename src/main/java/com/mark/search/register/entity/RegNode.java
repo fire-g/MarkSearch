@@ -28,11 +28,11 @@ public class RegNode extends Node {
         this.status = status;
     }
 
-    public int getStatus() {
+    public final int getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public final void setStatus(int status) {
         this.status = status;
     }
 

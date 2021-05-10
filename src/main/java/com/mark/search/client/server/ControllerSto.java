@@ -36,51 +36,51 @@ public class ControllerSto {
      */
     private boolean body;
 
-    public String getPath() {
+    public final String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
+    public final void setPath(String path) {
         this.path = path;
     }
 
-    public String getMethod() {
+    public final String getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public final void setMethod(String method) {
         this.method = method;
     }
 
-    public Object getController() {
+    public final Object getController() {
         return controller;
     }
 
-    public void setController(Object controller) {
+    public final void setController(Object controller) {
         this.controller = controller;
     }
 
-    public String getMethodName() {
+    public final String getMethodName() {
         return methodName;
     }
 
-    public void setMethodName(String methodName) {
+    public final void setMethodName(String methodName) {
         this.methodName = methodName;
     }
 
-    public boolean isMap() {
+    public final boolean isMap() {
         return map;
     }
 
-    public void setMap(boolean map) {
+    public final void setMap(boolean map) {
         this.map = map;
     }
 
-    public boolean isBody() {
+    public final boolean isBody() {
         return body;
     }
 
-    public void setBody(boolean body) {
+    public final void setBody(boolean body) {
         this.body = body;
     }
 }

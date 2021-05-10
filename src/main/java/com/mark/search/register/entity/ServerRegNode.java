@@ -21,19 +21,19 @@ public class ServerRegNode extends RegNode {
         flushTime = l;
     }
 
-    public long getRegisterTime() {
+    public final long getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(long registerTime) {
+    public final void setRegisterTime(long registerTime) {
         this.registerTime = registerTime;
     }
 
-    public long getFlushTime() {
+    public final long getFlushTime() {
         return flushTime;
     }
 
-    public void setFlushTime(long flushTime) {
+    public final void setFlushTime(long flushTime) {
         this.flushTime = flushTime;
     }
 

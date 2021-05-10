@@ -43,27 +43,27 @@ public class IndexNode extends Node {
         this.status=status;
     }
 
-    public boolean isMaster() {
+    public final boolean isMaster() {
         return master;
     }
 
-    public void setMaster(boolean master) {
+    public final void setMaster(boolean master) {
         this.master = master;
     }
 
-    public int getId() {
+    public final int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public final void setId(int id) {
         this.id = id;
     }
 
-    public int getStatus() {
+    public final int getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public final void setStatus(int status) {
         this.status = status;
     }
 

@@ -2,13 +2,11 @@ package com.mark.search.index.service.impl;
 
 import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.Service;
+import com.mark.search.index.annotation.Search;
+import com.mark.search.index.core.WriterFactory;
 import com.mark.search.index.log.LogFactory;
 import com.mark.search.index.log.Logger;
-import com.mark.search.index.annotation.Search;
 import com.mark.search.index.service.WriterService;
-import com.mark.search.index.subject.Index;
-import com.sun.istack.internal.NotNull;
-import com.mark.search.index.core.WriterFactory;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -83,7 +81,7 @@ public class WriterServiceImpl implements WriterService {
 
     @Override
     public long execute(String[] strings) {
-        for(String s:strings){
+        for (String s : strings) {
             Object index = logger.log2Index(s);
             try {
                 Document document = createDocument(index);
@@ -195,7 +193,7 @@ public class WriterServiceImpl implements WriterService {
      * @param store      是否存储
      * @return 域
      */
-    private Field createIndexField(String fieldName, @NotNull String value, boolean participle, boolean store) {
+    private Field createIndexField(String fieldName, String value, boolean participle, boolean store) {
         Field field;
         if (participle) {
             //分词索引并且存储

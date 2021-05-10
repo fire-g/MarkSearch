@@ -1,6 +1,7 @@
 package com.mark.search.register.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mark.search.register.service.RegisterCenter;
 
 /**
  * 注册中心地址实体
@@ -17,22 +18,15 @@ public class RegNode extends Node {
      */
     private int status;
 
-    private boolean master;
+
+    public RegNode(){
+
+    }
 
     public RegNode(String ip, int port, int status) {
         super(ip, port);
         this.status = status;
-        master = true;
     }
-
-    public boolean isMaster() {
-        return master;
-    }
-
-    public void setMaster(boolean master) {
-        this.master = master;
-    }
-
 
     public int getStatus() {
         return status;

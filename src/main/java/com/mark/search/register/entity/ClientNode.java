@@ -6,6 +6,10 @@ package com.mark.search.register.entity;
  */
 public class ClientNode extends Node {
 
+    public ClientNode(){
+
+    }
+
     public ClientNode(String ip, int port) {
         super(ip, port);
     }

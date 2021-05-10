@@ -36,6 +36,13 @@ public class IndexNode extends Node {
         master = true;
     }
 
+    public IndexNode(int id,String ip,int port,boolean master,int status){
+        super(ip,port);
+        this.id=id;
+        this.master=master;
+        this.status=status;
+    }
+
     public boolean isMaster() {
         return master;
     }

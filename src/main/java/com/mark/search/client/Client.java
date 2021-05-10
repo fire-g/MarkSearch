@@ -1,16 +1,22 @@
 package com.mark.search.client;
 
-import com.mark.search.index.subject.Index;
-import com.mark.search.index.subject.MarkDoc;
+import com.mark.search.annotation.Component;
 import com.mark.search.index.service.SearchService;
 import com.mark.search.index.service.WriterService;
+import com.mark.search.index.subject.Index;
+import com.mark.search.index.subject.MarkDoc;
 import com.mark.search.register.entity.IndexNode;
+import com.mark.search.register.service.ClientCenter;
+import com.mark.search.register.service.IndexCenter;
+import com.mark.search.register.service.RegisterCenter;
+import com.mark.search.util.Constant;
 
 import java.util.*;
 
 /**
  * @author haotian
  */
+@Component
 public class Client {
 
     /**
@@ -39,7 +45,8 @@ public class Client {
         if (indexNode == null) {
             return false;
         }
-        WriterService service = com.mark.search.rpc.client.Client.getRemoteProxyObj(WriterService.class, indexNode.getIp(), indexNode.getPort());
+        WriterService service = com.mark.search.rpc.client.Client.getRemoteProxyObj(
+                WriterService.class, indexNode.getIp(), indexNode.getPort());
         System.out.println(service.execute(index));
         return true;
     }
@@ -54,12 +61,32 @@ public class Client {
         List<Map<String, Object>> results = new ArrayList<>();
         for (Set<IndexNode> indexNodeSet : ClientFactory.MAP.values()) {
             IndexNode node = indexNodeSet.iterator().next();
-            SearchService searchService = com.mark.search.rpc.client.Client.getRemoteProxyObj(SearchService.class, node.getIp(), node.getPort());
+            SearchService searchService = com.mark.search.rpc.client.Client.getRemoteProxyObj(
+                    SearchService.class, node.getIp(), node.getPort());
             MarkDoc[] markDocs = searchService.search(word);
             System.out.println("Search:" + markDocs.length);
             results.addAll(searchService.getDocument(markDocs));
         }
         return results;
+    }
+
+    public Object list(){
+        IndexCenter center = com.mark.search.rpc.client.Client.getRemoteProxyObj(
+                IndexCenter.class, Constant.regNode.getIp(),Constant.regNode.getPort());
+        return center.list();
+    }
+
+    public Object regNodes(){
+        RegisterCenter center= com.mark.search.rpc.client.Client.getRemoteProxyObj(
+                RegisterCenter.class,Constant.regNode.getIp(),Constant.regNode.getPort());
+        return center.list();
+    }
+
+    public Object clients(){
+        ClientCenter center= com.mark.search.rpc.client.Client.getRemoteProxyObj(
+          ClientCenter.class,Constant.regNode.getIp(),Constant.regNode.getPort()
+        );
+        return center.list();
     }
 
 }

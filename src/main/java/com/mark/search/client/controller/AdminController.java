@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.mark.search.annotation.Controller;
 import com.mark.search.annotation.GET;
+import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.POST;
 import com.mark.search.client.Client;
 import com.mark.search.index.subject.*;
@@ -17,6 +18,9 @@ import java.util.Map;
  */
 @Controller
 public class AdminController {
+
+    @Inject
+    private Client client;
 
     @GET(path = "/")
     public String obj() {
@@ -55,6 +59,55 @@ public class AdminController {
         Object o = new Client().search(word);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GET(path = "/index-nodes")
+    public String list(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Object o = new Client().list();
+        if(o==null){
+            return null;
+        }
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GET(path = "/register-nodes")
+    public String reg(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Object o = new Client().regNodes();
+        if(o==null){
+            return null;
+        }
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    @GET(path = "/client-nodes")
+    public String clients(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Object o = new Client().clients();
+        if(o==null){
+            return null;
+        }
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(o);
         } catch (JsonProcessingException e) {

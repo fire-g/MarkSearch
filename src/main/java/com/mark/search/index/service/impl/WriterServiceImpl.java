@@ -1,8 +1,12 @@
 package com.mark.search.index.service.impl;
 
+import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.Service;
+import com.mark.search.index.log.LogFactory;
+import com.mark.search.index.log.Logger;
 import com.mark.search.index.annotation.Search;
 import com.mark.search.index.service.WriterService;
+import com.mark.search.index.subject.Index;
 import com.sun.istack.internal.NotNull;
 import com.mark.search.index.core.WriterFactory;
 import org.apache.lucene.document.*;
@@ -19,7 +23,14 @@ import java.util.List;
  */
 @Service(name = "index")
 public class WriterServiceImpl implements WriterService {
+
     private IndexWriter writer;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private LogFactory factory;
 
     public WriterServiceImpl() {
         writer = WriterFactory.getWriter();
@@ -27,6 +38,7 @@ public class WriterServiceImpl implements WriterService {
 
     @Override
     public long execute(Object o) {
+        logger.add2Log(o);
         try {
             Document document = createDocument(o);
             return add(document);
@@ -67,6 +79,21 @@ public class WriterServiceImpl implements WriterService {
         l = writer.commit();
         return l;
 //        log.info("影响提交数\t"+l);
+    }
+
+    @Override
+    public long execute(String[] strings) {
+        for(String s:strings){
+            Object index = logger.log2Index(s);
+            try {
+                Document document = createDocument(index);
+                return add(document);
+            } catch (IllegalAccessException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        factory.redo(strings);
+        return 0;
     }
 
     /**

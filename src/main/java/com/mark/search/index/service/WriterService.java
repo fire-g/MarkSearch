@@ -20,4 +20,11 @@ public interface WriterService {
      * @param list 多个对象
      */
     long execute(List<?> list);
+
+    /**
+     * 通过日志重做
+     * @param strings 日志列表
+     * @return long
+     */
+    long execute(String[] strings);
 }

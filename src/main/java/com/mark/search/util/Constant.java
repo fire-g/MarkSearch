@@ -4,12 +4,18 @@ import com.mark.search.client.server.HttpServer;
 import com.mark.search.register.entity.RegNode;
 import com.mark.search.rpc.server.Server;
 
+import java.io.File;
+
 /**
  * 程序公共参数
  *
  * @author haotian
  */
 public class Constant {
+    /**
+     * 配置信息存储地址
+     */
+    public static File configDir = new File(System.getProperty("user.dir") + File.separator + "data" + File.separator + "c");
     /**
      * 将当前程序启动成注册服务器
      */
@@ -39,16 +45,6 @@ public class Constant {
      * 本机ip
      */
     public static String ip = "127.0.0.1";
-
-    /**
-     * 索引服务的id
-     */
-    public static int indexNode = 0;
-
-    /**
-     * 是否是索引服务id为@{indexNode}的主结点
-     */
-    public static boolean indexMaster = true;
 
     public static RegNode regNode = null;
 

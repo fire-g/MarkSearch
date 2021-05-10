@@ -6,13 +6,18 @@ import com.mark.search.register.entity.RegNode;
 import java.util.*;
 
 /**
+ * 索引节点的基本信息
  * @author haotian
  */
-public class IndexFactory {
+public class IndexContent {
+    /**
+     * id
+     */
+    public static int id=0;
     /**
      * 索引写入时间
      */
-    public static long time = 0;
+    public static Long time = 0L;
 
     /**
      * 是否是主节点

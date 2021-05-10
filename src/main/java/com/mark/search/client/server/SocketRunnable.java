@@ -53,18 +53,18 @@ public class SocketRunnable implements Runnable {
             ControllerSto sto=null;
             Map<String,Object> obj=new HashMap<>();
             while ((requestHeader = bd.readLine()) != null && !requestHeader.isEmpty()) {
-                System.out.println(requestHeader);
                 //获得GET参数
                 if (requestHeader.startsWith("GET")) {
                     int begin = requestHeader.indexOf("GET") + 4;
                     int end = requestHeader.indexOf("HTTP/") - 1;
                     //获取路由
                     String condition = requestHeader.substring(begin, end);
+                    System.out.println(condition);
                     //处理路由
                     String[] conditions = getStrings(obj, condition);
                     sto=findGetByPath(conditions[0]);
                 }else if(requestHeader.startsWith("POST")){
-                    int begin = requestHeader.indexOf("POST") + 6;
+                    int begin = requestHeader.indexOf("POST") + 5;
                     int end = requestHeader.indexOf("HTTP/") - 1;
                     //获取路由
                     String condition = requestHeader.substring(begin, end);

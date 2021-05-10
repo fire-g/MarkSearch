@@ -94,9 +94,8 @@ public class CenterFactory {
      * 2、向本地结点中添加
      */
     public synchronized static void regNodes(IndexNode indexNode) {
-        INDEX_NODES.remove(indexNode);
-        INDEX_NODES.add(indexNode);
         SERVER_NODES.add(new ServerIndexNode(indexNode));
+        INDEX_NODES.add(new ServerIndexNode(indexNode));
     }
 
     /**

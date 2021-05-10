@@ -1,6 +1,7 @@
 package com.mark.search.index.service.impl;
 
 import com.mark.search.annotation.Service;
+import com.mark.search.index.IndexContent;
 import com.mark.search.index.service.SearchService;
 import com.mark.search.index.subject.MarkDoc;
 import com.mark.search.util.Constant;
@@ -21,7 +22,7 @@ import java.util.*;
  */
 @Service(name = "index")
 public class SearchServiceImpl implements SearchService {
-    private IndexSearcher searcher;
+    private final IndexSearcher searcher;
 
     public SearchServiceImpl() {
         searcher = SearchFactory.getSearcher();
@@ -46,7 +47,7 @@ public class SearchServiceImpl implements SearchService {
             for (ScoreDoc doc : hits) {
                 MarkDoc markDoc = new MarkDoc();
                 markDoc.doc = doc.doc;
-                markDoc.node = Constant.indexNode;
+                markDoc.node = IndexContent.id;
                 markDoc.score = doc.score;
                 markDocs.add(markDoc);
             }

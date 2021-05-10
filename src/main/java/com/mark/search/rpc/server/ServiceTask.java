@@ -2,6 +2,7 @@ package com.mark.search.rpc.server;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mark.search.util.ReflexFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,7 +41,8 @@ public class ServiceTask implements Runnable {
             }
             Method method1 = serviceClass.getMethod(method, parameterTypes);
             //获取执行结果
-            Object result = method1.invoke(ServiceFactory.newInstance(serviceClass), arguments);
+            Object o = ReflexFactory.getInstance(serviceClass);
+            Object result = method1.invoke(o, arguments);
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             String str = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);

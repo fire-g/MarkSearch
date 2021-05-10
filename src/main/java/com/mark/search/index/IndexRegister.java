@@ -1,11 +1,14 @@
 package com.mark.search.index;
 
+import com.mark.search.index.log.LoggerDispense;
+import com.mark.search.pool.Pool;
 import com.mark.search.register.entity.IndexNode;
 import com.mark.search.register.entity.RegNode;
 import com.mark.search.register.service.IndexCenter;
 import com.mark.search.register.service.RegisterCenter;
 import com.mark.search.rpc.client.Client;
 import com.mark.search.util.Constant;
+import com.mark.search.util.ReflexFactory;
 
 import java.util.Arrays;
 
@@ -20,8 +23,8 @@ import java.util.Arrays;
  * @author haotian
  */
 public class IndexRegister implements Runnable {
-    private final IndexNode indexNode;
-    private RegNode regNode;
+    private IndexNode indexNode;
+    private final RegNode regNode;
 
     public IndexRegister(IndexNode indexNode, RegNode regNode) {
         this.indexNode = indexNode;
@@ -32,6 +35,7 @@ public class IndexRegister implements Runnable {
     public void run() {
         //1、测试reg服务器是否提供服务
         RegisterCenter register = Client.getRemoteProxyObj(RegisterCenter.class, regNode.getIp(), regNode.getPort());
+
         String hello = register.hello();
         if (!"Hello".equals(hello)) {
             return;
@@ -44,8 +48,18 @@ public class IndexRegister implements Runnable {
         final IndexCenter center = Client.getRemoteProxyObj(IndexCenter.class, regNode.getIp(), regNode.getPort());
         //注册服务
         //当配置文件里面的indexNode!=-1时
-        IndexNode indexNode = center.register(Constant.ip, Constant.port);
-        Constant.indexNode = indexNode.getId();
+        if(IndexContent.id==0) {
+            indexNode = center.register(Constant.ip, Constant.port);
+            IndexContent.id = indexNode.getId();
+            IndexContent.master=indexNode.isMaster();
+            IndexContent.status=indexNode.getStatus();
+        }else {
+            center.register(indexNode);
+        }
+        //定时向主节点询问并获取节点信息
+        if(!IndexContent.master){
+            Pool.execute(ReflexFactory.getInstance(LoggerDispense.class));
+        }
 
         //心跳发送
         while (Constant.index) {
@@ -56,7 +70,7 @@ public class IndexRegister implements Runnable {
                 e.printStackTrace();
             }
             IndexNode[] indexNodes = center.heartBeat(indexNode);
-            IndexFactory.indexNodes.addAll(Arrays.asList(indexNodes));
+            IndexContent.indexNodes.addAll(Arrays.asList(indexNodes));
             System.out.println(Arrays.toString(indexNodes));
         }
     }

@@ -32,6 +32,7 @@ public class CenterRegister implements Runnable {
     public void run() {
         //IP和端口都相同则认为是同一台中心服务器，无需注册
         if (node.getPort() == regNode.getPort() && node.getIp().equals(regNode.getIp())) {
+            CenterFactory.regRegNode(node);
             return;
         }
         //获取服务

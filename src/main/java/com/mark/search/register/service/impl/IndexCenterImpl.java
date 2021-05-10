@@ -28,7 +28,8 @@ public class IndexCenterImpl implements IndexCenter {
 
     @Override
     public boolean register(IndexNode indexNode) {
-        CenterFactory.regNodes(indexNode);
+        ServerIndexNode node = new ServerIndexNode(indexNode);
+        CenterFactory.regNodes(node);
         return true;
     }
 

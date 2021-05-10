@@ -3,7 +3,11 @@ package com.mark.search;
 import com.mark.search.annotation.Service;
 import com.mark.search.client.ClientRegister;
 import com.mark.search.client.server.HttpServer;
+import com.mark.search.index.IndexContent;
+import com.mark.search.index.IndexContentSyn;
 import com.mark.search.index.IndexRegister;
+import com.mark.search.index.log.Logger;
+import com.mark.search.index.log.LoggerWriter;
 import com.mark.search.pool.Pool;
 import com.mark.search.register.CenterRegister;
 import com.mark.search.register.entity.ClientNode;
@@ -12,6 +16,8 @@ import com.mark.search.register.entity.RegNode;
 import com.mark.search.rpc.server.Server;
 import com.mark.search.rpc.server.ServerImpl;
 import com.mark.search.util.Constant;
+import com.mark.search.util.ConstantSyn;
+import com.mark.search.util.ReflexFactory;
 import com.mark.search.util.Util;
 
 import java.io.*;
@@ -27,8 +33,8 @@ import java.util.*;
 public class MarkSearchApplication {
     private final String[] args;
 
-    public MarkSearchApplication(String[] args){
-        this.args=args;
+    public MarkSearchApplication(String[] args) {
+        this.args = args;
     }
 
     /**
@@ -46,7 +52,7 @@ public class MarkSearchApplication {
      */
     private final List<Class<?>> services = new ArrayList<>();
 
-    public void run() throws IOException {
+    public void run() throws Exception {
         //解析参数
         argsConfig();
         //获取包
@@ -54,22 +60,34 @@ public class MarkSearchApplication {
         //通过包遍历类
         try {
             searchClass(p.getName());
+            ReflexFactory.init(classes.toArray(new Class[0]));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         //获取服务
         searchService();
-        //开启HTTP服务
-        HttpServer httpServer = new HttpServer(Constant.http,searchController());
-        Pool.execute(httpServer);
+
         //生成RPC服务对象
         Server server = new ServerImpl(Constant.port);
         Constant.rpcServer = server;
         System.out.println("注册服务...");
         registerService();
+
+        //开启HTTP服务
+        HttpServer httpServer = new HttpServer(Constant.http, searchController());
+        Constant.server = httpServer;
+        Pool.execute(httpServer);
+
+        System.out.println("开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
+        System.out.println("本地访问(HTTP):http://localhost" + ":" + Constant.http);
+
+        //启动RPC服务
         server.start();
     }
 
+    /**
+     * 查找所有的RPC服务
+     */
     public void searchService() {
         //遍历所有类
         //类剔除接口
@@ -77,19 +95,22 @@ public class MarkSearchApplication {
         for (Class<?> clazz : classes) {
             if (!clazz.isInterface()) {
                 if (clazz.getAnnotation(com.mark.search.annotation.Service.class) != null) {
-                    System.out.println(clazz.getName());
                     services.add(clazz);
                 }
             }
         }
     }
 
-    public Class<?>[] searchController(){
+    /**
+     * 搜索HTTP控制服务器控制层类
+     *
+     * @return 类数组
+     */
+    public Class<?>[] searchController() {
         List<Class<?>> cla = new ArrayList<>();
         for (Class<?> clazz : classes) {
             if (!clazz.isInterface()) {
                 if (clazz.getAnnotation(com.mark.search.annotation.Controller.class) != null) {
-                    System.out.println(clazz.getName());
                     cla.add(clazz);
                 }
             }
@@ -144,63 +165,186 @@ public class MarkSearchApplication {
         }
     }
 
-    private void argsConfig(){
+    /**
+     * 根据参数加载组件
+     */
+    private void argsConfig() throws Exception {
         //获取本机ip
         Constant.ip = Util.getAddress();
+        System.out.println("本机IP:" + Constant.ip);
         //将参数存入Map
-        Map<String,String> argMap=new HashMap<>();
+        Map<String, String> argMap = new HashMap<>();
 
-        if(args.length>0){
-            for(int i=0;i<args.length;i++){
-                argMap.put(args[i],args[i+1]);
+        if (args.length > 0) {
+            for (int i = 0; i < args.length; i++) {
+                argMap.put(args[i], args[i + 1]);
                 i++;
             }
-        }else {
-            Constant.regNode= new RegNode(Constant.ip,Constant.port,0);
         }
 
+        System.out.println("正在加载配置文件...");
+        //查看参数文件是否存在
+        File config = new File(Constant.configDir + File.separator + "config.properties");
+        if (config.exists()) {
+            //加载已有参数
+            config();
+        } else {
+            System.out.println("配置文件未找到...\n默认模式启动...");
+            //既没有配置文件,也没有输入参数,则默认启动
+            //三种方案同时启动
+            Constant.regNode = new RegNode(Constant.ip, Constant.port, 0);
+        }
+
+        //自定义HTTP端口
+        String http = argMap.get("--http");
+        if (http != null) {
+            Constant.http = Integer.parseInt(http);
+        }
+        //自定义RPC端口
+        String rpc = argMap.get("--rpc");
+        if (rpc != null) {
+            Constant.port = Integer.parseInt(rpc);
+        }
+        //设置默认注册服务器
+        Constant.regNode = new RegNode(Constant.ip, Constant.port, 0);
+
+        //设置启动模式,加入模式还是自建模式
+        String status = argMap.get("--status");
+        if (status != null) {
+            if ("main".equals(status)) {
+                Constant.regNode = new RegNode(Constant.ip, Constant.port, 0);
+            } else if ("member".equals(status)) {
+                String register = argMap.get("--register");
+                if (register != null) {
+                    setReg(register);
+                } else {
+                    throw new Exception("加入模式下必须要设置注册中心");
+                }
+
+            }
+        }
+
+        //设置运行组件
+        String as = argMap.get("--as");
+        if (as != null) {
+            setAs(as);
+        }
+        Pool.execute(ReflexFactory.getInstance(ConstantSyn.class));
+        Pool.execute(ReflexFactory.getInstance(IndexContentSyn.class));
+        System.out.println("注册中心:" + Constant.regNode.getIp() + ":" + Constant.regNode.getPort());
     }
 
-    private void config() throws IOException {
-        File config = new File("./config.properties");
+    /**
+     * 设置组件
+     *
+     * @param as 组件
+     */
+    private void setAs(String as) {
+        String[] ass = as.split("\\|");
+        //先全部置未不运行
+        Constant.client = false;
+        Constant.index = false;
+        Constant.register = false;
+        //然后根据条件指定运行
+        for (String str : ass) {
+            if ("index".equals(str)) {
+                Constant.index = true;
+            } else if ("register".equals(str)) {
+                Constant.register = true;
+            } else if ("client".equals(str)) {
+                Constant.client = true;
+            }
+        }
+        System.out.println("index:" + Constant.index);
+    }
+
+    private void setReg(String reg) {
+        String[] ss = reg.split(":");
+        Constant.regNode = new RegNode(ss[0], Integer.parseInt(ss[1]), 0);
+    }
+
+    /**
+     * 加载配置文件
+     */
+    private void config() {
+        File config = new File(Constant.configDir + File.separator + "config.properties");
         //加载配置文件
         try {
             //声明配置文件
             InputStream inStream = new FileInputStream(config);
             Properties prop = new Properties();
             prop.load(inStream);
+            //获取rpc端口
             String key = prop.getProperty("port");
-            System.out.println(key);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.out.println("配置文件未找到...");
-            System.out.println("正在创建配置文件...");
-            boolean b = config.createNewFile();
-            if (b) {
-                System.out.println("配置文件创建成功");
+            if (key != null) {
+                Constant.port = Integer.parseInt(key);
+            }
+            //获取http端口
+            String http = prop.getProperty("http.port");
+            if (http != null) {
+                Constant.http = Integer.parseInt(http);
+            }
+
+            //获取组件
+            String as = prop.getProperty("as");
+            if (as != null) {
+                setAs(as);
+            }
+
+            //设置注册中心
+            String reg = prop.getProperty("register");
+            if (reg != null) {
+                setReg(reg);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        System.out.println("获取本机ip:" + Constant.ip);
-
-        //如果配置本机未结点中心
-        //则添加本机为注册中心
-//        if (m == null || m) {
-//            //添加注册中心
-//            regNode = new RegNode(Constant.ip, Constant.port, 0);
-//        }
-//        Constant.regNode = regNode;
+        indexConfig();
     }
 
-    public static void main(String[] args) throws IOException {
-        RegNode regNode = null;
+    private void indexConfig() {
+        File config = new File(Constant.configDir + File.separator + "index.properties");
+        if (!config.exists()) {
+            return;
+        }
+        //加载配置文件
+        try {
+            //声明配置文件
+            InputStream inStream = new FileInputStream(config);
+            Properties prop = new Properties();
+            prop.load(inStream);
+            inStream.close();
+            //获取节点id
+            String id = prop.getProperty("id");
+            if (id != null) {
+                IndexContent.id = Integer.parseInt(id);
+            }
+            //获取节点状态
+            String master = prop.getProperty("master");
+            if (master != null) {
+                IndexContent.master = Boolean.parseBoolean(master);
+            }
+
+            //获取状态
+            String as = prop.getProperty("status");
+            if (as != null) {
+                IndexContent.status = Integer.parseInt(as);
+            }
+
+            //获取时间
+            String reg = prop.getProperty("time");
+            if (reg != null) {
+                IndexContent.time = Long.valueOf(reg);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
         //是否作为起始结点
         //true 表示是起始结点
         //false 表示不是起始结点，是作为边隅结点加入核心系统
-        Boolean m = null;
         //处理输入参数
         //-status 将程序作为什么类型的服务
         // main:将程序作为主服务
@@ -210,56 +354,6 @@ public class MarkSearchApplication {
         // index:将程序作为索引服务器启动
         // client:将程序作为客户端启动
         //-port 服务器监听运行的端口,当前版本只作为客户端不需要监听
-//        if (args.length > 0) {
-//            for (int i = 0; i < args.length; i++) {
-//                switch (args[i]) {
-//                    case "-status":
-//                        String status = args[i + 1];
-//                        if ("main".equals(status)) {
-//                            m = true;
-//                        } else if ("member".equals(status)) {
-//                            m = false;
-//                        }
-//                        i++;
-//                        break;
-//                    case "-as":
-//                        String ss = args[i + 1];
-//                        String[] str = ss.split("\\|");
-//                        for (String s : str) {
-//                            if ("com/mark/search/register".equals(s)) {
-//                                Constant.register = true;
-//                            } else if ("com/mark/search/index".equals(s)) {
-//                                Constant.index = true;
-//                            } else if ("com/mark/search/client".equals(s)) {
-//                                Constant.client = true;
-//                            }
-//                        }
-//                        i++;
-//                        break;
-//                    case "-port":
-//                        int port = Integer.parseInt(args[i + 1]);
-//                        Constant.port = port;
-//                        System.out.println(port);
-//                        i++;
-//                        break;
-//                    case "-register":
-//                        //如果未设置
-//                        if (m != null && !m) {
-//                            String[] o = args[i + 1].split(":");
-//                            String ip = o[0];
-//                            int po = Integer.parseInt(o[1]);
-//                            regNode = new RegNode(ip, po, 0);
-//                        }
-//                        break;
-//                    default:
-//                        System.out.println("无法识别的指令：" + args[i]);
-//                        break;
-//                }
-//            }
-//        }
-
-
-
         new MarkSearchApplication(args).run();
     }
 
@@ -274,8 +368,12 @@ public class MarkSearchApplication {
         }
         if (Constant.index) {
             registerService("index");
+            //初始化日志
+            ReflexFactory.getInstance(Logger.class).init();
             //添加index注册
-            Pool.execute(new IndexRegister(new IndexNode(Constant.indexNode, Constant.ip, Constant.port), Constant.regNode));
+            Pool.execute(new IndexRegister(new IndexNode(IndexContent.id, Constant.ip, Constant.port, IndexContent.master, IndexContent.status), Constant.regNode));
+            //日志缓存服务
+            Pool.execute(ReflexFactory.getInstance(LoggerWriter.class));
         }
         if (Constant.client) {
             registerService("client");
@@ -286,6 +384,7 @@ public class MarkSearchApplication {
 
     /**
      * 根据指定服务类型名称注册服务
+     *
      * @param name 服务类型名称
      */
     public void registerService(String name) {

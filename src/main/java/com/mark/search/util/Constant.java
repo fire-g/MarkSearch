@@ -39,7 +39,7 @@ public class Constant {
     /**
      * Client监听的HTTP端口
      */
-    public static int http = 8080;
+    public static int http = 8090;
 
     /**
      * 本机ip

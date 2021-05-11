@@ -1,9 +1,6 @@
 package com.mark.search.log;
 
-import java.text.DateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * 日志输出

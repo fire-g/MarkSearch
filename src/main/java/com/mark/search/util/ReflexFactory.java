@@ -2,6 +2,7 @@ package com.mark.search.util;
 
 import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.Single;
+import com.mark.search.log.Log;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -65,7 +66,7 @@ public class ReflexFactory {
      * @return 对象
      */
     public static Object newInstance(Class<?> clz){
-        System.out.println("实例化单例对象:"+clz.getName());
+        Log.log(ReflexFactory.class,"实例化单例对象:"+clz.getName());
         Object o=null;
         try {
             o = clz.newInstance();

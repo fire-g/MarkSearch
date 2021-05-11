@@ -2,6 +2,7 @@ package com.mark.search.rpc.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mark.search.log.Log;
 import com.mark.search.rpc.RemoteService;
 
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class DynamicProxy implements InvocationHandler {
         output.writeUTF(((Class<?>) obj).getName());
         output.writeUTF(method.getName());
         if (socket.isClosed()) {
-            System.out.println("socket is closed");
+            Log.log(this.getClass(),"socket is closed");
         }
         output.writeObject(method.getParameterTypes());
         output.writeObject(args);

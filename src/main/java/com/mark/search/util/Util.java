@@ -1,5 +1,7 @@
 package com.mark.search.util;
 
+import com.mark.search.log.Log;
+
 import javax.naming.Context;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -68,7 +70,7 @@ public class Util {
         List<String> classes = getClassesList(url);
         // 遍历classes，如果发现@Component就注入到容器中
 //        scanComponent2Container(classes);
-        System.out.println(classes);
+        Log.log(Util.class,classes);
     }
 
     private static String getClassPath() throws UnsupportedEncodingException {
@@ -91,16 +93,14 @@ public class Util {
 
     private static List<String> getAllClass(File file) {
         List<String> ret = new ArrayList<>();
-        System.out.println("name:" + file.getName());
-        System.out.println(file.isDirectory());
+        Log.log(Util.class,"name:" + file.getName());
+        Log.log(Util.class,file.isDirectory());
         if (file.isDirectory()) {
             File[] list = file.listFiles();
-            System.out.println(list != null);
+            Log.log(Util.class,list != null);
             if (list != null) {
-                System.out.println(list.length);
                 for (File i : list) {
                     List<String> j = getAllClass(i);
-                    System.out.println("s" + j);
                     ret.addAll(j);
                 }
             }

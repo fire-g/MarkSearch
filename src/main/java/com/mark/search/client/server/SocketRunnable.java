@@ -1,5 +1,7 @@
 package com.mark.search.client.server;
 
+import com.mark.search.log.Log;
+
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,7 +61,7 @@ public class SocketRunnable implements Runnable {
                     int end = requestHeader.indexOf("HTTP/") - 1;
                     //获取路由
                     String condition = requestHeader.substring(begin, end);
-                    System.out.println(condition);
+                    Log.log(this.getClass(),condition);
                     //处理路由
                     String[] conditions = getStrings(obj, condition);
                     sto=findGetByPath(conditions[0]);
@@ -68,7 +70,7 @@ public class SocketRunnable implements Runnable {
                     int end = requestHeader.indexOf("HTTP/") - 1;
                     //获取路由
                     String condition = requestHeader.substring(begin, end);
-                    System.out.println("POST参数:"+condition);
+                    Log.log(this.getClass(),"POST参数:"+condition);
                     //处理路由
                     String[] conditions = getStrings(obj, condition);
                     sto= findPostByPath(conditions[0]);
@@ -79,7 +81,7 @@ public class SocketRunnable implements Runnable {
                     int begin = requestHeader.indexOf("Content-Length:") + "Content-Length:".length();
                     String postParamterLength = requestHeader.substring(begin).trim();
                     contentLength = Integer.parseInt(postParamterLength);
-                    System.out.println("POST参数长度是：" + Integer.parseInt(postParamterLength));
+                    Log.log(this.getClass(),"POST参数长度是：" + Integer.parseInt(postParamterLength));
                 }
             }
             StringBuilder sb = new StringBuilder();
@@ -91,7 +93,7 @@ public class SocketRunnable implements Runnable {
                         break;
                     }
                 }
-                System.out.println("POST参数是：" + sb.toString());
+                Log.log(this.getClass(),"POST参数是：" + sb.toString());
             }
             //发送回执
             PrintWriter pw = new PrintWriter(socket.getOutputStream());

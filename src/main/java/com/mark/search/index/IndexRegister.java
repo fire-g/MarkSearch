@@ -1,6 +1,7 @@
 package com.mark.search.index;
 
 import com.mark.search.index.log.LoggerDispense;
+import com.mark.search.log.Log;
 import com.mark.search.pool.Pool;
 import com.mark.search.register.entity.IndexNode;
 import com.mark.search.register.entity.RegNode;
@@ -40,8 +41,7 @@ public class IndexRegister implements Runnable {
         if (!"Hello".equals(hello)) {
             return;
         }
-        //
-        System.out.println("注册中心:" + regNode.getIp() + ":" + regNode.getPort() + "正常...");
+        Log.log(this.getClass(),"注册中心:" + regNode.getIp() + ":" + regNode.getPort() + "正常...");
         //获取所有注册中心
         RegNode[] regNodes = register.list();
         //2、开始心跳发送
@@ -71,7 +71,6 @@ public class IndexRegister implements Runnable {
             }
             IndexNode[] indexNodes = center.heartBeat(indexNode);
             IndexContent.indexNodes.addAll(Arrays.asList(indexNodes));
-            System.out.println(Arrays.toString(indexNodes));
         }
     }
 }

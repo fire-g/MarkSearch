@@ -5,6 +5,7 @@ import com.mark.search.index.service.SearchService;
 import com.mark.search.index.service.WriterService;
 import com.mark.search.index.subject.Index;
 import com.mark.search.index.subject.MarkDoc;
+import com.mark.search.log.Log;
 import com.mark.search.register.entity.IndexNode;
 import com.mark.search.register.service.ClientCenter;
 import com.mark.search.register.service.IndexCenter;
@@ -29,7 +30,7 @@ public class Client {
         //1、获取索引服务器列表
         //随机获取结点
         int size = ClientFactory.MAP.size();
-        System.out.println("Map:" + size);
+        Log.log(this.getClass(),"Map:" + size);
         Random random = new Random(System.currentTimeMillis());
         int n = random.nextInt(size);
         Integer[] s = ClientFactory.MAP.keySet().toArray(new Integer[0]);
@@ -47,7 +48,7 @@ public class Client {
         }
         WriterService service = com.mark.search.rpc.client.Client.getRemoteProxyObj(
                 WriterService.class, indexNode.getIp(), indexNode.getPort());
-        System.out.println(service.execute(index));
+        Log.log(this.getClass(),service.execute(index));
         return true;
     }
 
@@ -64,7 +65,7 @@ public class Client {
             SearchService searchService = com.mark.search.rpc.client.Client.getRemoteProxyObj(
                     SearchService.class, node.getIp(), node.getPort());
             MarkDoc[] markDocs = searchService.search(word);
-            System.out.println("Search:" + markDocs.length);
+            Log.log(this.getClass(),"Search:" + markDocs.length);
             results.addAll(searchService.getDocument(markDocs));
         }
         return results;

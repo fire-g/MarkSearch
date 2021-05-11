@@ -1,5 +1,7 @@
 package com.mark.search.util;
 
+import com.mark.search.log.Log;
+
 import java.io.*;
 import java.util.Properties;
 
@@ -24,7 +26,7 @@ public class Property {
     public Property(String f) {
         file = new File(f);
         if (!file.exists()) {
-            System.out.println("配置文件不存在");
+            Log.log(this.getClass(),"配置文件不存在");
         }
         try {
             properties.load(new FileInputStream(file));

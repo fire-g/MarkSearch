@@ -1,6 +1,7 @@
 package com.mark.search.index.log;
 
 import com.mark.search.annotation.Component;
+import com.mark.search.log.Log;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -30,7 +31,7 @@ public class LogFactory {
         if (!directory.exists()) {
             boolean b = directory.mkdirs();
             if (!b) {
-                System.out.println("日志目录创建失败");
+                Log.log(this.getClass(),"日志目录创建失败");
             }
         }
         //获取时间

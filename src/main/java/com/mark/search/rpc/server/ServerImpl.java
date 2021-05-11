@@ -1,5 +1,6 @@
 package com.mark.search.rpc.server;
 
+import com.mark.search.log.Log;
 import com.mark.search.pool.Pool;
 
 import java.io.*;
@@ -45,7 +46,7 @@ public class ServerImpl implements Server {
             return;
         }
         isRunning = true;
-        System.out.println("服务启动...");
+        Log.log(this.getClass(),"服务启动...");
         while (true) {
             Socket socket;
             try {

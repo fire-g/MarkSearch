@@ -8,7 +8,7 @@ import com.mark.search.annotation.Controller;
 import com.mark.search.annotation.GET;
 import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.POST;
-import com.mark.search.client.Client;
+import com.mark.search.client.AutoClient;
 import com.mark.search.index.subject.*;
 import com.mark.search.log.Log;
 
@@ -21,7 +21,7 @@ import java.util.Map;
 public class AdminController {
 
     @Inject
-    private Client client;
+    private AutoClient autoClient;
 
     @GET(path = "/")
     public String obj() {
@@ -48,16 +48,16 @@ public class AdminController {
             index = gson.fromJson(builder.toString(), Question.class);
         }
         if (index != null) {
-            new Client().index(index);
+            new AutoClient().index(index);
         }
         return type;
     }
 
-    @GET(path = "/search")
+    @GET(path = "/api/v1/search")
     public String search(Map<String, Object> map) {
         String word = (String) map.get("word");
         Log.log(this.getClass(),"Word:" + word);
-        Object o = new Client().search(word);
+        Object o = new AutoClient().search(word);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
@@ -68,11 +68,11 @@ public class AdminController {
         return null;
     }
 
-    @GET(path = "/index-nodes")
+    @GET(path = "/api/v1/index-nodes")
     public String list(){
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        Object o = new Client().list();
+        Object o = new AutoClient().list();
         if(o==null){
             return null;
         }
@@ -84,11 +84,11 @@ public class AdminController {
         return null;
     }
 
-    @GET(path = "/register-nodes")
+    @GET(path = "/api/v1/register-nodes")
     public String reg(){
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        Object o = new Client().regNodes();
+        Object o = new AutoClient().regNodes();
         if(o==null){
             return null;
         }
@@ -101,11 +101,11 @@ public class AdminController {
     }
 
 
-    @GET(path = "/client-nodes")
+    @GET(path = "/api/v1/client-nodes")
     public String clients(){
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        Object o = new Client().clients();
+        Object o = new AutoClient().clients();
         if(o==null){
             return null;
         }

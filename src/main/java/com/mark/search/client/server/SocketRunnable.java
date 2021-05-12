@@ -61,10 +61,11 @@ public class SocketRunnable implements Runnable {
                     int end = requestHeader.indexOf("HTTP/") - 1;
                     //获取路由
                     String condition = requestHeader.substring(begin, end);
-                    Log.log(this.getClass(),condition);
+
                     //处理路由
                     String[] conditions = getStrings(obj, condition);
                     sto=findGetByPath(conditions[0]);
+                    Log.log(this.getClass(),"GET "+condition + (sto==null?" 404 NotFound":""));
                 }else if(requestHeader.startsWith("POST")){
                     int begin = requestHeader.indexOf("POST") + 5;
                     int end = requestHeader.indexOf("HTTP/") - 1;
@@ -81,7 +82,6 @@ public class SocketRunnable implements Runnable {
                     int begin = requestHeader.indexOf("Content-Length:") + "Content-Length:".length();
                     String postParamterLength = requestHeader.substring(begin).trim();
                     contentLength = Integer.parseInt(postParamterLength);
-                    Log.log(this.getClass(),"POST参数长度是：" + Integer.parseInt(postParamterLength));
                 }
             }
             StringBuilder sb = new StringBuilder();

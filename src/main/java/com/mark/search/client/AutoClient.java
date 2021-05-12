@@ -5,6 +5,7 @@ import com.mark.search.index.service.SearchService;
 import com.mark.search.index.service.WriterService;
 import com.mark.search.index.subject.Index;
 import com.mark.search.index.subject.MarkDoc;
+import com.mark.search.index.subject.SearchResult;
 import com.mark.search.log.Log;
 import com.mark.search.register.entity.IndexNode;
 import com.mark.search.register.service.ClientCenter;
@@ -18,7 +19,7 @@ import java.util.*;
  * @author haotian
  */
 @Component
-public class Client {
+public class AutoClient {
 
     /**
      * 添加索引
@@ -59,6 +60,7 @@ public class Client {
      * @return 搜索结果
      */
     public Object search(String word) {
+        long s=System.currentTimeMillis();
         List<Map<String, Object>> results = new ArrayList<>();
         for (Set<IndexNode> indexNodeSet : ClientFactory.MAP.values()) {
             IndexNode node = indexNodeSet.iterator().next();
@@ -68,7 +70,13 @@ public class Client {
             Log.log(this.getClass(),"Search:" + markDocs.length);
             results.addAll(searchService.getDocument(markDocs));
         }
-        return results;
+        long ss=System.currentTimeMillis();
+        Map<String,Object> result=new HashMap<>();
+        result.put("data",results);
+        result.put("page",1);
+        result.put("total",results.size());
+        result.put("time",ss-s);
+        return result;
     }
 
     public Object list(){

@@ -18,6 +18,13 @@ public interface SearchService {
     MarkDoc[] search(String query);
 
     /**
+     * 根据图片Hash查找图片
+     * @param hash 图片hash
+     * @return 返回图片结构
+     */
+    MarkDoc[] searchImage(String hash);
+
+    /**
      * 获取文档
      *
      * @param docs 文档id

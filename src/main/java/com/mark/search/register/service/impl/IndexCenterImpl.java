@@ -37,7 +37,11 @@ public class IndexCenterImpl implements IndexCenter {
     public IndexNode register(String ip, int port) {
         //默认分布式扩展
         Random random = new Random();
-        ServerIndexNode node = new ServerIndexNode(new IndexNode(random.nextInt(), ip, port));
+        int i = random.nextInt();
+        if(i<0){
+            i= -i;
+        }
+        ServerIndexNode node = new ServerIndexNode(new IndexNode(i, ip, port));
         CenterFactory.regNodes(node);
         return node;
     }

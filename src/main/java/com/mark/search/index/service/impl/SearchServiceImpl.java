@@ -15,6 +15,7 @@ import org.apache.lucene.search.*;
 import com.mark.search.util.Util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -55,6 +56,17 @@ public class SearchServiceImpl implements SearchService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return new MarkDoc[0];
+    }
+
+    @Override
+    public MarkDoc[] searchImage(String hash) {
+        char[] chars = hash.toCharArray();
+        int[] ints=new int[8];
+        for(int i=0;i<8;i=i+2){
+            ints[i]=Integer.parseInt(String.valueOf(chars[i]) + chars[i + 1],16);
+        }
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
         return new MarkDoc[0];
     }
 

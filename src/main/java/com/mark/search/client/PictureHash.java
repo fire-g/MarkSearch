@@ -1,15 +1,15 @@
 package com.mark.search.client;
 
-import com.mark.search.MarkSearchApplication;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 图片hash
+ * 提供图片转hash功能
  * @author HaoTian
  */
 public class PictureHash {
@@ -36,6 +36,12 @@ public class PictureHash {
         return null;
     }
 
+    /**
+     * 获取图片hash
+     * @param in inputStream
+     * @return 8字节16进制字符
+     * @throws IOException IOException
+     */
     public String pHash(InputStream in)throws IOException{
         BufferedImage image=changeSize(8,8,in);
         for(int i=0;i<image.getWidth();i++){
@@ -58,7 +64,7 @@ public class PictureHash {
                 comps[i]=0;
             }
         }
-        StringBuffer hashCode = new StringBuffer();
+        StringBuilder hashCode = new StringBuilder();
         for(int i=0;i<comps.length;i+=4){
             int result = comps[i]*(int)Math.pow(2,3)+
                     comps[i+1]*(int)Math.pow(2,2)+
@@ -70,6 +76,11 @@ public class PictureHash {
         return hashCode.toString();
     }
 
+    /**
+     * 获取图片灰度
+     * @param pixel color
+     * @return rgb
+     */
     public static int getGray(Color pixel){
         return (pixel.getRed()*30+pixel.getGreen()*60+pixel.getBlue()*10)/100;
     }

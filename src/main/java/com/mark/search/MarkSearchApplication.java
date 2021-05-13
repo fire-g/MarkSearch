@@ -86,11 +86,6 @@ public class MarkSearchApplication {
         Log.log(this.getClass(),"注册服务...");
         registerService();
 
-        //开启HTTP服务
-        HttpServer httpServer = new HttpServer(Constant.http, searchController());
-        Constant.server = httpServer;
-        Pool.execute(httpServer);
-
         Log.log(this.getClass(),"开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
         Log.log(this.getClass(),"本地访问(HTTP):http://localhost" + ":" + Constant.http);
         //启动RPC服务
@@ -182,7 +177,13 @@ public class MarkSearchApplication {
         //这个时候我们已经得到了指定包下所有的类的绝对路径了。我们现在利用这些绝对路径和java的反射机制得到他们的类对象
         for (String s : classPaths) {
             //把 D:\work\code\20170401\search-class\target\classes\com\baibin\search\a\A.class 这样的绝对路径转换为全类名com.baibin.search.a.A
-            s = s.replace(classpath.replace("/", "\\").replaceFirst("\\\\", ""), "").replace("\\", ".").replace(".class", "");
+            String path = classpath.replace("/", "\\").
+                    replaceFirst("\\\\", "");
+            s = s.replace(path
+                    , "").replace(classpath,"").
+                    replace("\\", ".").
+                    replace("/",".").
+                    replace(".class", "");
             Class<?> cls = Class.forName(s);
             classes.add(cls);
         }
@@ -220,7 +221,7 @@ public class MarkSearchApplication {
         Constant.ip = Util.getAddress();
         Log.log(this.getClass(),"本机IP:" + Constant.ip);
         //将参数存入Map
-        Map<String, String> argMap = new HashMap<>();
+        Map<String, String> argMap = new HashMap<>(2);
 
         if (args.length > 0) {
             for (int i = 0; i < args.length; i++) {
@@ -302,7 +303,6 @@ public class MarkSearchApplication {
                 Constant.client = true;
             }
         }
-        Log.log(this.getClass(),"index:" + Constant.index);
     }
 
     private void setReg(String reg) {
@@ -424,6 +424,15 @@ public class MarkSearchApplication {
         }
         if (Constant.client) {
             registerService("client");
+            //开启HTTP服务
+            HttpServer httpServer = null;
+            try {
+                httpServer = new HttpServer(Constant.http, searchController());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Constant.server = httpServer;
+            Pool.execute(httpServer);
             //客户端注册
             Pool.execute(new ClientRegister(new ClientNode(Constant.ip, Constant.port), Constant.regNode));
         }

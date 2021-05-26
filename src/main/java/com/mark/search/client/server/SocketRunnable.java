@@ -78,8 +78,8 @@ public class SocketRunnable implements Runnable {
                 }
                 //获得POST参数
                 //1.获取请求内容长度
-                if (requestHeader.startsWith("Content-Length")) {
-                    int begin = requestHeader.indexOf("Content-Length:") + "Content-Length:".length();
+                if (requestHeader.startsWith("content-length")) {
+                    int begin = requestHeader.indexOf("content-length:") + "content-length:".length();
                     String postParamterLength = requestHeader.substring(begin).trim();
                     contentLength = Integer.parseInt(postParamterLength);
                 }

@@ -67,7 +67,6 @@ public class AutoClient {
             SearchService searchService = com.mark.search.rpc.client.Client.getRemoteProxyObj(
                     SearchService.class, node.getIp(), node.getPort());
             MarkDoc[] markDocs = searchService.search(word);
-            Log.log(this.getClass(),"Search:" + markDocs.length);
             results.addAll(searchService.getDocument(markDocs));
         }
         long ss=System.currentTimeMillis();

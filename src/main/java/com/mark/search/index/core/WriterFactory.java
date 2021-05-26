@@ -27,6 +27,7 @@ public class WriterFactory {
         } catch (IOException e) {
             e.printStackTrace();
             writer = null;
+
         }
     }
 

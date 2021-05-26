@@ -14,8 +14,8 @@ public class Pool {
      * 线程池
      */
     private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(
-            20, 200, 0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(1024), new ThreadPoolExecutor.AbortPolicy());
+            2000, 200000, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(1024 * 1024), new ThreadPoolExecutor.AbortPolicy());
 
     public static void shutdown() {
         EXECUTOR_SERVICE.shutdown();

@@ -11,6 +11,8 @@ import java.io.IOException;
  */
 public class DirectoryFactory {
     private static Directory directory;
+    private static long time;
+    private final static Object O =new Object();
 
     static {
         initDirectory();
@@ -21,13 +23,30 @@ public class DirectoryFactory {
      */
     public static void initDirectory() {
         try {
-            directory = FSDirectory.open(new File(System.getProperty("user.dir") + File.separator + "data" + File.separator + "i").toPath());
+            directory = FSDirectory.open(new File(System.getProperty("user.dir") +
+                    File.separator + "data" + File.separator + "i").toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void reload(){
+        try {
+            Directory directory = FSDirectory.open(new File(System.getProperty("user.dir") +
+                    File.separator + "data" + File.separator + "i").toPath());
+            synchronized (O){
+                DirectoryFactory.directory = directory;
+                time = System.currentTimeMillis();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static Directory getDirectory() {
+        if((System.currentTimeMillis() - time)>1000*30){
+            reload();
+        }
         return directory;
     }
 }

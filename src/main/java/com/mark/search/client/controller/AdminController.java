@@ -10,7 +10,6 @@ import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.POST;
 import com.mark.search.client.AutoClient;
 import com.mark.search.index.subject.*;
-import com.mark.search.log.Log;
 
 import java.util.Map;
 
@@ -56,7 +55,6 @@ public class AdminController {
     @GET(path = "/api/v1/search")
     public String search(Map<String, Object> map) {
         String word = (String) map.get("word");
-        Log.log(this.getClass(),"Word:" + word);
         Object o = new AutoClient().search(word);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

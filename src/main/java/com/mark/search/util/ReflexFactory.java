@@ -79,7 +79,7 @@ public class ReflexFactory {
                     Class<?> clazz = field.getType();
                     //此处需添加单例判定
                     if (!map.containsKey(clazz.getName())) {
-                        map.put(clazz.getName(),newInstance(clz));
+                        map.put(clazz.getName(),newInstance(clazz));
                     }
                     field.setAccessible(true);
                     field.set(o,map.get(clazz.getName()));
@@ -103,6 +103,7 @@ public class ReflexFactory {
         if(o!=null){
             return (T)o;
         }
+        Log.log(ReflexFactory.class,"getInstance");
         return (T)newInstance(clz);
     }
 

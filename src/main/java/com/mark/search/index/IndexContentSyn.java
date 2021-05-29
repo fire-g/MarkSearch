@@ -14,11 +14,13 @@ import java.util.Properties;
  */
 @Component
 public class IndexContentSyn implements Runnable {
-    private Date date=new Date();
-    private DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+    private final DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
     @Override
     public void run() {
-
+        //如果配置文件目录不存在,则直接结束参数同步线程
+        if(!Constant.configDir.exists()){
+            return;
+        }
         File config = new File(Constant.configDir + File.separator + "index.properties");
         if (!config.exists()) {
             try {
@@ -43,7 +45,7 @@ public class IndexContentSyn implements Runnable {
                 prop.setProperty("time",IndexContent.time+"");
                 prop.setProperty("status",IndexContent.status+"");
                 OutputStream outputStream=new FileOutputStream(config);
-                date=new Date();
+                Date date = new Date();
                 prop.store(outputStream,format.format(date));
                 outputStream.close();
             }

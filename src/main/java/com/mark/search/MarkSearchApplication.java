@@ -60,38 +60,56 @@ public class MarkSearchApplication {
     public void run() throws Exception {
         //判断Protocol
         URL url = this.getClass().getResource("");
+        String basePackage = this.getClass().getPackage().getName();
+        Log.log(this.getClass(), "base package:" + basePackage);
         String protocol = url.getProtocol();
-        Log.log(this.getClass(),"协议:" + protocol);
+        Log.log(this.getClass(), "协议:" + protocol);
         if ("jar".equalsIgnoreCase(protocol)) {
-            searchJarClass("com.mark.search");
+            searchJarClass(basePackage);
+        }
+        if ("file".equalsIgnoreCase(protocol)) {
+            //获取包
+            Package p = this.getClass().getPackage();
+            //通过包遍历
+            searchClass(p.getName());
+        }
+        //初始化单例工厂
+        ReflexFactory.init(classes.toArray(new Class[0]));
+        //初始化配置文件目录
+        if (!Constant.configDir.exists()) {
+            boolean b = Constant.configDir.mkdirs();
+            if (b) {
+                Log.log(this.getClass(), "配置文件目录创建成功...");
+            } else {
+                Log.log(this.getClass(), "配置文件目录创建失败...");
+            }
         }
 
         //解析参数
         argsConfig();
-        //获取包
-        Package p = this.getClass().getPackage();
-        //通过包遍历类
-        try {
-            searchClass(p.getName());
-            ReflexFactory.init(classes.toArray(new Class[0]));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
         //获取服务
         searchService();
 
         //生成RPC服务对象
         Server server = new ServerImpl(Constant.port);
         Constant.rpcServer = server;
-        Log.log(this.getClass(),"注册服务...");
+        Log.log(this.getClass(), "注册服务...");
         registerService();
 
-        Log.log(this.getClass(),"开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
-        Log.log(this.getClass(),"本地访问(HTTP):http://localhost" + ":" + Constant.http);
+        Log.log(this.getClass(), "开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
+        Log.log(this.getClass(), "本地访问(HTTP):http://localhost" + ":" + Constant.http);
         //启动RPC服务
         server.start();
     }
 
+    /**
+     * 搜索Jar包里面的类文件
+     *
+     * @param basePackage 包
+     * @throws IOException            IOException
+     * @throws ClassNotFoundException ClassNotFoundException
+     */
     public void searchJarClass(String basePackage) throws IOException, ClassNotFoundException {
         //通过当前线程得到类加载器并获取URL的枚举
         Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(
@@ -109,16 +127,13 @@ public class MarkSearchApplication {
                         while (jarEntryEnumeration.hasMoreElements()) {
                             JarEntry entry = jarEntryEnumeration.nextElement();
                             String jarEntryName = entry.getName();
-                            Log.log(this.getClass(),jarEntryName);
-                            if (
-                                    jarEntryName.contains(".class") &&
-                                    jarEntryName.replaceAll("/", ".").startsWith(basePackage)
-                            ) {
-                                String className = jarEntryName.
-                                        substring(0, jarEntryName.lastIndexOf(".")).
+                            if (jarEntryName.contains(".class") &&
+                                    jarEntryName.replaceAll("/", ".").
+                                            startsWith(basePackage)) {
+                                String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).
                                         replaceAll("/", ".");
                                 Class<?> cls = Class.forName(className);
-                                Log.log(this.getClass(),cls.getName());
+                                classes.add(cls);
                             }
                         }
                     }
@@ -180,9 +195,9 @@ public class MarkSearchApplication {
             String path = classpath.replace("/", "\\").
                     replaceFirst("\\\\", "");
             s = s.replace(path
-                    , "").replace(classpath,"").
+                    , "").replace(classpath, "").
                     replace("\\", ".").
-                    replace("/",".").
+                    replace("/", ".").
                     replace(".class", "");
             Class<?> cls = Class.forName(s);
             classes.add(cls);
@@ -219,7 +234,7 @@ public class MarkSearchApplication {
     private void argsConfig() throws Exception {
         //获取本机ip
         Constant.ip = Util.getAddress();
-        Log.log(this.getClass(),"本机IP:" + Constant.ip);
+        Log.log(this.getClass(), "本机IP:" + Constant.ip);
         //将参数存入Map
         Map<String, String> argMap = new HashMap<>(2);
 
@@ -230,14 +245,14 @@ public class MarkSearchApplication {
             }
         }
 
-        Log.log(this.getClass(),"正在加载配置文件...");
+        Log.log(this.getClass(), "正在加载配置文件...");
         //查看参数文件是否存在
         File config = new File(Constant.configDir + File.separator + "config.properties");
         if (config.exists()) {
             //加载已有参数
             config();
         } else {
-            Log.log(this.getClass(),"配置文件未找到 >> 默认模式启动...");
+            Log.log(this.getClass(), "配置文件未找到 >> 默认模式启动...");
             //既没有配置文件,也没有输入参数,则默认启动
             //三种方案同时启动
             Constant.regNode = new RegNode(Constant.ip, Constant.port, 0);
@@ -279,7 +294,7 @@ public class MarkSearchApplication {
         }
         Pool.execute(ReflexFactory.getInstance(ConstantSyn.class));
         Pool.execute(ReflexFactory.getInstance(IndexContentSyn.class));
-        Log.log(this.getClass(),"注册中心:" + Constant.regNode.getIp() + ":" + Constant.regNode.getPort());
+        Log.log(this.getClass(), "注册中心:" + Constant.regNode.getIp() + ":" + Constant.regNode.getPort());
     }
 
     /**
@@ -446,7 +461,7 @@ public class MarkSearchApplication {
     public void registerService(String name) {
         List<Class<?>> list = findServices(name);
         for (Class<?> clazz : list) {
-            Log.log(this.getClass(),"注册服务:" + clazz.toString());
+            Log.log(this.getClass(), "注册服务:" + clazz.toString());
             Constant.rpcServer.register(clazz);
         }
     }

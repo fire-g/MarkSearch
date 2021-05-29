@@ -1,7 +1,6 @@
 package com.mark.search.util;
 
 import com.mark.search.annotation.Component;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -17,11 +16,14 @@ import java.util.Properties;
  */
 @Component
 public class ConstantSyn implements Runnable {
-    private Date date=new Date();
-    private DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+    private final DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public void run() {
+        //如果配置文件目录不存在,则直接结束参数同步线程
+        if(!Constant.configDir.exists()){
+            return;
+        }
         while (true){
             File config = new File(Constant.configDir+File.separator+"config.properties");
             if(!config.exists()){
@@ -58,7 +60,7 @@ public class ConstantSyn implements Runnable {
                     prop.setProperty("as",list.get(0)+"|"+list.get(1)+"|"+list.get(2));
                 }
                 OutputStream outputStream=new FileOutputStream(config);
-                date=new Date();
+                Date date = new Date();
                 prop.store(outputStream,format.format(date));
                 Thread.sleep(1000*5);
                 outputStream.close();

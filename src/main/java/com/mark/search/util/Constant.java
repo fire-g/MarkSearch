@@ -15,7 +15,7 @@ public class Constant {
     /**
      * 配置信息存储地址
      */
-    public static File configDir = new File(System.getProperty("user.dir") + File.separator + "data" + File.separator + "c");
+    public static File configDir = new File(System.getProperty("user.dir") + File.separator + "data" + File.separator + "config");
     /**
      * 将当前程序启动成注册服务器
      */

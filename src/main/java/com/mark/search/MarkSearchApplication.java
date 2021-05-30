@@ -16,17 +16,11 @@ import com.mark.search.register.entity.IndexNode;
 import com.mark.search.register.entity.RegNode;
 import com.mark.search.rpc.server.Server;
 import com.mark.search.rpc.server.ServerImpl;
-import com.mark.search.util.Constant;
-import com.mark.search.util.ConstantSyn;
-import com.mark.search.util.ReflexFactory;
-import com.mark.search.util.Util;
+import com.mark.search.util.*;
 
 import java.io.*;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  * 启动流程
@@ -41,11 +35,6 @@ public class MarkSearchApplication {
     public MarkSearchApplication(String[] args) {
         this.args = args;
     }
-
-    /**
-     * 类路径集合
-     */
-    private final List<String> classPaths = new ArrayList<>();
 
     /**
      * 类列表
@@ -65,13 +54,13 @@ public class MarkSearchApplication {
         String protocol = url.getProtocol();
         Log.log(this.getClass(), "协议:" + protocol);
         if ("jar".equalsIgnoreCase(protocol)) {
-            searchJarClass(basePackage);
+            classes.addAll(PackageScan.scanJarClass(basePackage));
         }
         if ("file".equalsIgnoreCase(protocol)) {
             //获取包
             Package p = this.getClass().getPackage();
             //通过包遍历
-            searchClass(p.getName());
+            classes.addAll(PackageScan.scanFileClass(p.getName()));
         }
         //初始化单例工厂
         ReflexFactory.init(classes.toArray(new Class[0]));
@@ -89,13 +78,13 @@ public class MarkSearchApplication {
         argsConfig();
 
         //获取服务
-        searchService();
+        findRpcServices();
 
         //生成RPC服务对象
         Server server = new ServerImpl(Constant.port);
         Constant.rpcServer = server;
         Log.log(this.getClass(), "注册服务...");
-        registerService();
+        registerRpcService();
 
         Log.log(this.getClass(), "开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
         Log.log(this.getClass(), "本地访问(HTTP):http://localhost" + ":" + Constant.http);
@@ -104,48 +93,9 @@ public class MarkSearchApplication {
     }
 
     /**
-     * 搜索Jar包里面的类文件
-     *
-     * @param basePackage 包
-     * @throws IOException            IOException
-     * @throws ClassNotFoundException ClassNotFoundException
-     */
-    public void searchJarClass(String basePackage) throws IOException, ClassNotFoundException {
-        //通过当前线程得到类加载器并获取URL的枚举
-        Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(
-                basePackage.replace(".", "/"));
-        while (urls.hasMoreElements()) {
-            URL url = urls.nextElement();
-            String protocol = url.getProtocol();
-            if ("jar".equalsIgnoreCase(protocol)) {
-                JarURLConnection connection = (JarURLConnection) url.openConnection();
-                if (connection != null) {
-                    JarFile file = connection.getJarFile();
-                    if (file != null) {
-                        //得到该Jar文件下面的类实体
-                        Enumeration<JarEntry> jarEntryEnumeration = file.entries();
-                        while (jarEntryEnumeration.hasMoreElements()) {
-                            JarEntry entry = jarEntryEnumeration.nextElement();
-                            String jarEntryName = entry.getName();
-                            if (jarEntryName.contains(".class") &&
-                                    jarEntryName.replaceAll("/", ".").
-                                            startsWith(basePackage)) {
-                                String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).
-                                        replaceAll("/", ".");
-                                Class<?> cls = Class.forName(className);
-                                classes.add(cls);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * 查找所有的RPC服务
      */
-    public void searchService() {
+    public void findRpcServices() {
         //遍历所有类
         //类剔除接口
         //
@@ -163,7 +113,7 @@ public class MarkSearchApplication {
      *
      * @return 类数组
      */
-    public Class<?>[] searchController() {
+    public Class<?>[] findControllers() {
         List<Class<?>> cla = new ArrayList<>();
         for (Class<?> clazz : classes) {
             if (!clazz.isInterface()) {
@@ -173,59 +123,6 @@ public class MarkSearchApplication {
             }
         }
         return cla.toArray(new Class<?>[0]);
-    }
-
-    /**
-     * 遍历类
-     *
-     * @param basePack 基础包
-     * @throws ClassNotFoundException 可能出现Class无法找到的异常
-     */
-    public void searchClass(String basePack) throws ClassNotFoundException {
-        //先把包名转换为路径,首先得到项目的classpath
-        String classpath = Objects.requireNonNull(deduceMainApplicationClass()).getResource("/").getPath();
-        //然后把我们的包名basPach转换为路径名
-        basePack = basePack.replace(".", File.separator);
-        //然后把classpath和basePack合并
-        String searchPath = classpath + basePack;
-        doPath(new File(searchPath));
-        //这个时候我们已经得到了指定包下所有的类的绝对路径了。我们现在利用这些绝对路径和java的反射机制得到他们的类对象
-        for (String s : classPaths) {
-            //把 D:\work\code\20170401\search-class\target\classes\com\baibin\search\a\A.class 这样的绝对路径转换为全类名com.baibin.search.a.A
-            String path = classpath.replace("/", "\\").
-                    replaceFirst("\\\\", "");
-            s = s.replace(path
-                    , "").replace(classpath, "").
-                    replace("\\", ".").
-                    replace("/", ".").
-                    replace(".class", "");
-            Class<?> cls = Class.forName(s);
-            classes.add(cls);
-        }
-    }
-
-    /**
-     * 该方法会得到所有的类，将类的绝对路径写入到classPaths中
-     *
-     * @param file 路径
-     */
-    private void doPath(File file) {
-        //文件夹
-        if (file.isDirectory()) {
-            //文件夹我们就递归
-            File[] files = file.listFiles();
-            if (files != null) {
-                for (File f1 : files) {
-                    doPath(f1);
-                }
-            }
-        } else {//标准文件
-            //标准文件我们就判断是否是class文件
-            if (file.getName().endsWith(".class")) {
-                //如果是class文件我们就放入我们的集合中。
-                classPaths.add(file.getPath());
-            }
-        }
     }
 
     /**
@@ -422,14 +319,14 @@ public class MarkSearchApplication {
     /**
      * 注册服务
      */
-    public void registerService() {
+    public void registerRpcService() {
         if (Constant.register) {
-            registerService("register");
+            registerRpcService("register");
             //注册注册中心
             Pool.execute(new CenterRegister(new RegNode(Constant.ip, Constant.port, 0), Constant.regNode));
         }
         if (Constant.index) {
-            registerService("index");
+            registerRpcService("index");
             //初始化日志
             ReflexFactory.getInstance(Logger.class).init();
             //添加index注册
@@ -438,11 +335,11 @@ public class MarkSearchApplication {
             Pool.execute(ReflexFactory.getInstance(LoggerWriter.class));
         }
         if (Constant.client) {
-            registerService("client");
+            registerRpcService("client");
             //开启HTTP服务
             HttpServer httpServer = null;
             try {
-                httpServer = new HttpServer(Constant.http, searchController());
+                httpServer = new HttpServer(Constant.http, findControllers());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -458,31 +355,12 @@ public class MarkSearchApplication {
      *
      * @param name 服务类型名称
      */
-    public void registerService(String name) {
-        List<Class<?>> list = findServices(name);
+    public void registerRpcService(String name) {
+        List<Class<?>> list = findRpcServices(name);
         for (Class<?> clazz : list) {
             Log.log(this.getClass(), "注册服务:" + clazz.toString());
             Constant.rpcServer.register(clazz);
         }
-    }
-
-    /**
-     * 获取main函数所在类
-     *
-     * @return main函数所在类的Class对象
-     */
-    private Class<?> deduceMainApplicationClass() {
-        try {
-            StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
-            for (StackTraceElement stackTraceElement : stackTrace) {
-                if ("main".equals(stackTraceElement.getMethodName())) {
-                    return Class.forName(stackTraceElement.getClassName());
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 
     /**
@@ -491,7 +369,7 @@ public class MarkSearchApplication {
      * @param name 服务类型名
      * @return 服务列表
      */
-    public List<Class<?>> findServices(String name) {
+    public List<Class<?>> findRpcServices(String name) {
         List<Class<?>> classes = new ArrayList<>();
         for (Class<?> clazz : services) {
             Service service = clazz.getAnnotation(Service.class);

@@ -21,7 +21,7 @@ public class ReflexFactory {
     /**
      * 存储单例
      */
-    private final static Map<String,Object> map = new HashMap<>();
+    private final static Map<String,Object> MAP = new HashMap<>();
 
     /**
      * 单例工厂初始化,生成所有单例
@@ -37,7 +37,7 @@ public class ReflexFactory {
                 Single single=clz.getAnnotation(Single.class);
                 if(single!=null){
                     if(clz.isAnnotation()){
-                        interfaces.add((Class<? extends Annotation>)clz);
+                        interfaces.add(clz.asSubclass(Annotation.class));
                     }
                 }
             }
@@ -45,14 +45,14 @@ public class ReflexFactory {
         //获取单例
         for(Class<?> clz:list){
             if(!clz.isInterface()){
-                for(Class<? extends Annotation> annotation:interfaces){
+                for(Class<? extends  Annotation> annotation:interfaces){
                     Annotation obj =clz.getAnnotation(annotation);
                     if(obj!=null){
                         //获取单例
                         //当map中不包含实体类,则实例化
-                        if(!map.containsKey(clz.getName())){
+                        if(!MAP.containsKey(clz.getName())){
                             //实例化对象
-                            map.put(clz.getName(),newInstance(clz));
+                            MAP.put(clz.getName(),newInstance(clz));
                         }
                     }
                 }
@@ -65,9 +65,9 @@ public class ReflexFactory {
      * @param clz class
      * @return 对象
      */
-    public static Object newInstance(Class<?> clz){
+    public static <T> T newInstance(Class<T> clz){
         Log.log(ReflexFactory.class,"实例化单例对象:"+clz.getName());
-        Object o=null;
+        T o=null;
         try {
             o = clz.newInstance();
             Field[] fields = clz.getDeclaredFields();
@@ -78,11 +78,11 @@ public class ReflexFactory {
                 if(inject!=null){
                     Class<?> clazz = field.getType();
                     //此处需添加单例判定
-                    if (!map.containsKey(clazz.getName())) {
-                        map.put(clazz.getName(),newInstance(clazz));
+                    if (!MAP.containsKey(clazz.getName())) {
+                        MAP.put(clazz.getName(),newInstance(clazz));
                     }
                     field.setAccessible(true);
-                    field.set(o,map.get(clazz.getName()));
+                    field.set(o, MAP.get(clazz.getName()));
                 }
             }
         } catch (InstantiationException | IllegalAccessException e) {
@@ -94,17 +94,16 @@ public class ReflexFactory {
     /**
      * 生成一个对象,同时注入属性
      * 如果属性没有生成实例则生成实例,且需要注入属性的属性类必须是被Single修饰的
-     * @param clz
-     * @param <T>
-     * @return
+     * @param clz clz
+     * @param <T> T
+     * @return t
      */
     public static <T> T  getInstance(Class<T> clz) {
-        Object o = map.get(clz.getName());
-        if(o!=null){
-            return (T)o;
+        Object o = MAP.get(clz.getName());
+        if(o != null){
+            return clz.cast(o);
         }
-        Log.log(ReflexFactory.class,"getInstance");
-        return (T)newInstance(clz);
+        return newInstance(clz);
     }
 
 }

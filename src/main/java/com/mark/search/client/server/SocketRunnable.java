@@ -1,14 +1,11 @@
 package com.mark.search.client.server;
 
-import com.mark.search.log.Log;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +13,7 @@ import java.util.Map;
  * @author HaoTian
  */
 public class SocketRunnable implements Runnable {
-    private int status=200;
+    private int status = 200;
     protected static List<ControllerSto> postList = new ArrayList<>();
     protected static List<ControllerSto> getList = new ArrayList<>();
 
@@ -26,105 +23,43 @@ public class SocketRunnable implements Runnable {
         this.socket = socket;
     }
 
-    public ControllerSto findGetByPath(String path){
-        for(ControllerSto sto:getList){
-            if(sto.getPath().equals(path)){
-                return sto;
-            }
-        }
-        return null;
-    }
-
-    public ControllerSto findPostByPath(String path){
-        for(ControllerSto sto:postList){
-            if(sto.getPath().equals(path)){
-                return sto;
-            }
-        }
-        return null;
-    }
 
     @Override
     public void run() {
         try {
-            BufferedReader bd = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            //接受HTTP请求
-            String requestHeader;
-            int contentLength = 0;
-            ControllerSto sto=null;
-            Map<String,Object> obj=new HashMap<>();
-            while ((requestHeader = bd.readLine()) != null && !requestHeader.isEmpty()) {
-                //获得GET参数
-                if (requestHeader.startsWith("GET")) {
-                    int begin = requestHeader.indexOf("GET") + 4;
-                    int end = requestHeader.indexOf("HTTP/") - 1;
-                    //获取路由
-                    String condition = requestHeader.substring(begin, end);
-
-                    //处理路由
-                    String[] conditions = getStrings(obj, condition);
-                    sto=findGetByPath(conditions[0]);
-                    Log.log(this.getClass(),"GET "+condition + (sto==null?" 404 NotFound":""));
-                }else if(requestHeader.startsWith("POST")){
-                    int begin = requestHeader.indexOf("POST") + 5;
-                    int end = requestHeader.indexOf("HTTP/") - 1;
-                    //获取路由
-                    String condition = requestHeader.substring(begin, end);
-                    Log.log(this.getClass(),"POST参数:"+condition);
-                    //处理路由
-                    String[] conditions = getStrings(obj, condition);
-                    sto= findPostByPath(conditions[0]);
-                }
-                //获得POST参数
-                //1.获取请求内容长度
-                if (requestHeader.startsWith("content-length")) {
-                    int begin = requestHeader.indexOf("content-length:") + "content-length:".length();
-                    String postParamterLength = requestHeader.substring(begin).trim();
-                    contentLength = Integer.parseInt(postParamterLength);
-                }
-            }
-            StringBuilder sb = new StringBuilder();
-            if (contentLength > 0) {
-                for (int i = 0; i < contentLength; i++) {
-                    int a = bd.read();
-                    sb.append((char) a);
-                    if(sb.toString().getBytes().length>=contentLength){
-                        break;
-                    }
-                }
-                Log.log(this.getClass(),"POST参数是：" + sb.toString());
-            }
+            //解析HTTP请求
+            Http http = new Http(socket.getInputStream());
             //发送回执
             PrintWriter pw = new PrintWriter(socket.getOutputStream());
-            if(sto==null){
-                status=404;
-                pw.println("HTTP/1.1 "+status+" NotFound");
-                pw.println("Content-type:application/json;charset=utf-8");
-                pw.println();
-            }else {
-                pw.println("HTTP/1.1 "+status+" OK");
-                pw.println("Content-type:application/json;charset=utf-8");
-                pw.println();
-                Object o = sto.getController();
-                List<Class<?>> pa=new ArrayList<>();
-                if(sto.isBody()){
+            ControllerSto sto = http.getSto();
+            if (sto == null) {
+                status = 404;
+                pw.println(http.getVersion() + " " + status + " NotFound");
+            } else {
+                pw.println(http.getVersion() + " " + status + " OK");
+            }
+            pw.println("Content-type:application/json;charset=utf-8");
+            pw.println();
+            if (sto != null) {
+                Object o = http.getSto().getController();
+                List<Class<?>> pa = new ArrayList<>();
+                if (http.getSto().isBody()) {
                     pa.add(StringBuilder.class);
                 }
-                if(sto.isMap()){
+                if (http.getSto().isMap()) {
                     pa.add(Map.class);
                 }
-                Method method = o.getClass().getMethod(sto.getMethodName(),pa.toArray(new Class<?>[0]));
-                List<Object> objects=new ArrayList<>();
-                for(Class<?> cla:pa){
-                    if(cla==Map.class){
-                        objects.add(obj);
+                Method method = o.getClass().getMethod(http.getSto().getMethodName(), pa.toArray(new Class<?>[0]));
+                List<Object> objects = new ArrayList<>();
+                for (Class<?> cla : pa) {
+                    if (cla == Map.class) {
+                        objects.add(http.getMap());
                     }
-                    if(cla==StringBuilder.class){
-                        objects.add(sb);
+                    if (cla == StringBuilder.class) {
+                        objects.add(http.getBuilder());
                     }
                 }
-                Object object = method.invoke(o,objects.toArray());
+                Object object = method.invoke(o, objects.toArray());
                 pw.println(object.toString());
             }
             pw.flush();
@@ -134,23 +69,5 @@ public class SocketRunnable implements Runnable {
         }
     }
 
-    /**
-     * 提取参数
-     * @param obj
-     * @param condition
-     * @return
-     * @throws UnsupportedEncodingException
-     */
-    private String[] getStrings(Map<String, Object> obj, String condition) throws UnsupportedEncodingException {
-        String[] conditions = condition.split("\\?");
-        if (conditions.length == 2) {
-            String[] m = conditions[1].split("&");
-            for (String s : m) {
-                String[] ss = s.split("=");
-                String ab = URLDecoder.decode(ss[1], "utf-8");
-                obj.put(ss[0], ab);
-            }
-        }
-        return conditions;
-    }
+
 }

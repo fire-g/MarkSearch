@@ -2,10 +2,8 @@ package com.mark.search.client;
 
 import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import java.io.*;
 
 public class PictureHashTest {
 
@@ -20,8 +18,10 @@ public class PictureHashTest {
     @Test
     public void aa(){
         try {
-            InputStream stream = new FileInputStream("C:\\Users\\18296\\Desktop\\IMG_0253.PNG");
-            System.out.println(new PictureHash().pHash(stream));
+            InputStream stream = new FileInputStream("C:\\Users\\18296\\Desktop\\qhca.jpg");
+            PictureHash pictureHash=new PictureHash();
+            System.out.println(pictureHash.pHash(stream));
+            ImageIO.write(pictureHash.GrayImage(stream),"jpg",new File("C:\\Users\\18296\\Desktop\\a.jpg"));
         }catch (Exception e){
             e.printStackTrace();
         }

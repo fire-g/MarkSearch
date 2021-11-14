@@ -13,12 +13,15 @@ import java.util.Locale;
  */
 public class Log {
 
+    /**
+     * 当前接口已经重写，打印的是提示信息。
+     * 但是当前接口已经弃用，应当使用替代的<code>Log.Info(...)</code>接口
+     * @param clazz 错误发生的类
+     * @param args 需要打印的数据
+     */
     @Deprecated
     public synchronized static void log(Class<?> clazz, Object args) {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
-        Date date = new Date();
-        System.out.println(
-                df.format(date)+" " + clazz.getName() + "\t ::>> " + args.toString());
+        log(clazz,"INFO",args);
     }
 
     /**
@@ -40,7 +43,7 @@ public class Log {
     }
 
     /**
-     * 日志记录级别Info,当程序运行发生时记录信息使用
+     * 日志记录级别Info,当程序运行发生时记录提示信息使用
      * @param clazz 错误发生的类
      * @param args 需要打印的数据
      */

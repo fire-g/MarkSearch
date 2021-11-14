@@ -53,6 +53,6 @@ public class Log {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
         Date date = new Date();
         System.out.println(
-                type+" "+ " "+  df.format(date)+" " + clazz.getName()  + args.toString());
+                type+" "+ " "+  df.format(date)+" " + clazz.getName()+ " " + args.toString());
     }
 }

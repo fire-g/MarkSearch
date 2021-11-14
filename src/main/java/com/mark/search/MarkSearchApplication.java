@@ -50,9 +50,13 @@ public class MarkSearchApplication {
         //判断Protocol
         URL url = this.getClass().getResource("");
         String basePackage = this.getClass().getPackage().getName();
-        Log.log(this.getClass(), "base package:" + basePackage);
+        Log.Info(this.getClass(), "base package:" + basePackage);
+        if(url== null){
+            Log.Error(this.getClass(),"url is null");
+            return;
+        }
         String protocol = url.getProtocol();
-        Log.log(this.getClass(), "协议:" + protocol);
+        Log.Info(this.getClass(), "协议:" + protocol);
         if ("jar".equalsIgnoreCase(protocol)) {
             classes.addAll(PackageScan.scanJarClass(basePackage));
         }
@@ -68,9 +72,9 @@ public class MarkSearchApplication {
         if (!Constant.configDir.exists()) {
             boolean b = Constant.configDir.mkdirs();
             if (b) {
-                Log.log(this.getClass(), "配置文件目录创建成功...");
+                Log.Info(this.getClass(), "配置文件目录创建成功...");
             } else {
-                Log.log(this.getClass(), "配置文件目录创建失败...");
+                Log.Error(this.getClass(), "配置文件目录创建失败...");
             }
         }
 
@@ -83,11 +87,11 @@ public class MarkSearchApplication {
         //生成RPC服务对象
         Server server = new ServerImpl(Constant.port);
         Constant.rpcServer = server;
-        Log.log(this.getClass(), "注册服务...");
+        Log.Info(this.getClass(), "注册服务...");
         registerRpcService();
 
-        Log.log(this.getClass(), "开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
-        Log.log(this.getClass(), "本地访问(HTTP):http://localhost" + ":" + Constant.http);
+        Log.Info(this.getClass(), "开启HTTP服务:http://" + Constant.ip + ":" + Constant.http);
+        Log.Info(this.getClass(), "本地访问(HTTP):http://localhost" + ":" + Constant.http);
         //启动RPC服务
         server.start();
     }
@@ -131,7 +135,7 @@ public class MarkSearchApplication {
     private void argsConfig() throws Exception {
         //获取本机ip
         Constant.ip = Util.getAddress();
-        Log.log(this.getClass(), "本机IP:" + Constant.ip);
+        Log.Info(this.getClass(), "本机IP:" + Constant.ip);
         //将参数存入Map
         Map<String, String> argMap = new HashMap<>(2);
 
@@ -142,14 +146,14 @@ public class MarkSearchApplication {
             }
         }
 
-        Log.log(this.getClass(), "正在加载配置文件...");
+        Log.Info(this.getClass(), "正在加载配置文件...");
         //查看参数文件是否存在
         File config = new File(Constant.configDir + File.separator + "config.properties");
         if (config.exists()) {
             //加载已有参数
             config();
         } else {
-            Log.log(this.getClass(), "配置文件未找到 >> 默认模式启动...");
+            Log.Info(this.getClass(), "配置文件未找到 >> 默认模式启动...");
             //既没有配置文件,也没有输入参数,则默认启动
             //三种方案同时启动
             Constant.regNode = new RegNode(Constant.ip, Constant.port, 0);
@@ -191,7 +195,7 @@ public class MarkSearchApplication {
         }
         Pool.execute(ReflexFactory.getInstance(ConstantSyn.class));
         Pool.execute(ReflexFactory.getInstance(IndexContentSyn.class));
-        Log.log(this.getClass(), "注册中心:" + Constant.regNode.getIp() + ":" + Constant.regNode.getPort());
+        Log.Info(this.getClass(), "注册中心:" + Constant.regNode.getIp() + ":" + Constant.regNode.getPort());
     }
 
     /**
@@ -230,9 +234,9 @@ public class MarkSearchApplication {
         //加载配置文件
         try {
             //声明配置文件
-            InputStream inStream = new FileInputStream(config);
+            InputStream input = new FileInputStream(config);
             Properties prop = new Properties();
-            prop.load(inStream);
+            prop.load(input);
             //获取rpc端口
             String key = prop.getProperty("port");
             if (key != null) {
@@ -358,7 +362,7 @@ public class MarkSearchApplication {
     public void registerRpcService(String name) {
         List<Class<?>> list = findRpcServices(name);
         for (Class<?> clazz : list) {
-            Log.log(this.getClass(), "注册服务:" + clazz.toString());
+            Log.Info(this.getClass(), "注册服务:" + clazz.getName());
             Constant.rpcServer.register(clazz);
         }
     }

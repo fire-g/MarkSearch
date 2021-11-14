@@ -1,10 +1,12 @@
 package com.mark.search.util;
 
 import com.mark.search.client.server.HttpServer;
+import com.mark.search.index.subject.IndexConfig;
 import com.mark.search.register.entity.RegNode;
 import com.mark.search.rpc.server.Server;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 程序公共参数
@@ -20,6 +22,11 @@ public class Constant {
      * 将当前程序启动成注册服务器
      */
     public static boolean register = true;
+
+    /**
+     * 索引列表
+     */
+    public static List<IndexConfig> indexes;
 
     /**
      * 将当前程序启动成索引服务器

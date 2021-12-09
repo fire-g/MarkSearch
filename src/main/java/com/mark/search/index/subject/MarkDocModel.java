@@ -1,16 +1,22 @@
 package com.mark.search.index.subject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 文档规则模板，一个索引支持一个文档
  * @author HaoTian
  */
-public class MarkDocModel {
+public class  MarkDocModel {
     /**
      * 文档类型标识ID，索引ID
      */
     protected Long id;
+
+    /**
+     * 文档类型名
+     */
+    protected String name;
 
     /**
      * 是否可扩展
@@ -29,6 +35,15 @@ public class MarkDocModel {
      */
     public void addModel(MarkFieldModel model){
         models.add(model);
+    }
+
+    public MarkDocModel() {
+        models =new ArrayList<>(3);
+    }
+
+    public MarkDocModel(String name){
+        this();
+        this.name = name;
     }
 
 }

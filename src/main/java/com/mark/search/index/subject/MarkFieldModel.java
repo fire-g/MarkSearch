@@ -35,4 +35,11 @@ public class MarkFieldModel {
      * 是否必须
      */
     private boolean necessary;
+
+    public  MarkFieldModel() {
+    }
+
+    public MarkFieldModel(String name){
+        this.name = name;
+    }
 }

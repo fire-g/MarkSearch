@@ -28,4 +28,18 @@ public class MarkIndex {
      * 索引文件对象
      */
     public Directory directory;
+
+    /**
+     * 索引模型,承载了索引文档的标准
+     */
+    private MarkDocModel docModel;
+
+
+    public void setDocModel(MarkDocModel docModel) {
+        this.docModel = docModel;
+    }
+
+    public MarkDocModel getDocModel() {
+        return docModel;
+    }
 }

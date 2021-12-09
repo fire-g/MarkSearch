@@ -3,7 +3,6 @@ package com.mark.search.index.service.impl;
 import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.Service;
 import com.mark.search.index.annotation.Search;
-import com.mark.search.index.core.WriterFactory;
 import com.mark.search.index.log.LogFactory;
 import com.mark.search.index.log.Logger;
 import com.mark.search.index.service.WriterService;
@@ -22,7 +21,7 @@ import java.util.List;
 @Service(name = "index")
 public class WriterServiceImpl implements WriterService {
 
-    private final IndexWriter writer;
+    private IndexWriter writer;
 
     @Inject
     private Logger logger;
@@ -31,7 +30,7 @@ public class WriterServiceImpl implements WriterService {
     private LogFactory factory;
 
     public WriterServiceImpl() {
-        writer = WriterFactory.getWriter();
+        //writer = WriterFactory.getWriter();
     }
 
     @Override

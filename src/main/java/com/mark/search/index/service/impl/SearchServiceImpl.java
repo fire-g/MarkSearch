@@ -4,18 +4,13 @@ import com.mark.search.annotation.Service;
 import com.mark.search.index.IndexContent;
 import com.mark.search.index.service.SearchService;
 import com.mark.search.index.subject.MarkDoc;
-import com.mark.search.util.Constant;
-import com.mark.search.index.core.AnalyzerFactory;
-import com.mark.search.index.core.SearchFactory;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.*;
 import com.mark.search.util.Util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -23,10 +18,10 @@ import java.util.*;
  */
 @Service(name = "index")
 public class SearchServiceImpl implements SearchService {
-    private final IndexSearcher searcher;
+    private IndexSearcher searcher;
 
     public SearchServiceImpl() {
-        searcher = SearchFactory.getSearcher();
+        //searcher = SearchFactory.getSearcher();
     }
 
     @Override
@@ -71,8 +66,8 @@ public class SearchServiceImpl implements SearchService {
     }
 
     private void addShouldQuery(String fid, String value, BooleanQuery.Builder builder) throws ParseException {
-        Query content = new QueryParser(fid, AnalyzerFactory.getAnalyzer()).parse(value);
-        builder.add(content, BooleanClause.Occur.SHOULD);
+        //Query content = new QueryParser(fid, AnalyzerFactory.getAnalyzer()).parse(value);
+        //builder.add(content, BooleanClause.Occur.SHOULD);
     }
 
     @Override

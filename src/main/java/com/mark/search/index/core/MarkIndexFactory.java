@@ -1,8 +1,9 @@
-package com.mark.search.index.service;
+package com.mark.search.index.core;
 
 import com.mark.search.index.subject.MarkDocModel;
 import com.mark.search.index.subject.MarkIndex;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,10 @@ public class MarkIndexFactory {
      */
     private static List<MarkIndex> indexes;
 
+    private static void save(){
+
+    }
+
     /**
      * 获取索引
      * @return 获取索引
@@ -28,8 +33,10 @@ public class MarkIndexFactory {
      * 构建索引
      * @param model 索引构建模型
      */
-    public static void create(MarkDocModel model) {
-
+    public static void create(MarkDocModel model) throws IOException {
+        MarkIndex index = new MarkIndex();
+        index.create(model);
+        indexes.add(index);
     }
 
     /**

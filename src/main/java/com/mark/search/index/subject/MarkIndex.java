@@ -17,10 +17,6 @@ import java.io.IOException;
  * @author HaoTian
  */
 public class MarkIndex {
-    /**
-     * 索引唯一标识id
-     */
-    public long id;
 
     /**
      * 分词器
@@ -52,11 +48,12 @@ public class MarkIndex {
     }
 
     public void create(MarkDocModel docModel) throws IOException {
-        analyzer = new StandardAnalyzer();
-        directory = FSDirectory.open(new File(System.getProperty("user.dir") +
-                File.separator + "data" + File.separator + "i" + docModel.id).toPath());
+        this.analyzer = new StandardAnalyzer();
+        this.docModel =docModel;
+        this.directory = FSDirectory.open(new File(System.getProperty("user.dir") +
+                File.separator + "data" + File.separator + "i"+File.separator + docModel.id).toPath());
         initWriter();
-        searcher = new IndexSearcher(DirectoryReader.open(directory));
+        this.searcher = new IndexSearcher(DirectoryReader.open(directory));
     }
 
     /**
@@ -76,5 +73,45 @@ public class MarkIndex {
 
     public MarkDocModel getDocModel() {
         return docModel;
+    }
+
+    public long getId() {
+        return docModel.id;
+    }
+
+    public Analyzer getAnalyzer() {
+        return analyzer;
+    }
+
+    public void setAnalyzer(Analyzer analyzer) {
+        this.analyzer = analyzer;
+    }
+
+    public IndexSearcher getSearcher() {
+        return searcher;
+    }
+
+    public void setSearcher(IndexSearcher searcher) {
+        this.searcher = searcher;
+    }
+
+    public IndexWriter getWriter() {
+        return writer;
+    }
+
+    public void setWriter(IndexWriter writer) {
+        this.writer = writer;
+    }
+
+    public Directory getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(Directory directory) {
+        this.directory = directory;
+    }
+
+    public void setDocModel(MarkDocModel docModel) {
+        this.docModel = docModel;
     }
 }

@@ -25,7 +25,13 @@ public class MarkIndexFactory {
      * 获取索引
      * @return 获取索引
      */
-    public static MarkIndex get(){
+    public static MarkIndex get(long id){
+        for(MarkIndex index:indexes){
+            if(index.getId() == id)
+            {
+                return index;
+            }
+        }
         return null;
     }
 
@@ -54,7 +60,7 @@ public class MarkIndexFactory {
     public static List<Long> getAllId(){
         List<Long> idList=new ArrayList<>(3);
         for(MarkIndex index:indexes){
-            idList.add(index.id);
+            idList.add(index.getId());
         }
         return idList;
     }

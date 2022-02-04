@@ -23,6 +23,17 @@ public class Log {
     }
 
     /**
+     * 日志<br>
+     * 记录级别<em>Error</em><br>
+     * 当程序运行时发生错误打印错误日志
+     * @param obj 错误发生的对象
+     * @param args 需要打印的数据
+     */
+    public static void Error(Object obj,Object args){
+        Error(obj.getClass(),args);
+    }
+
+    /**
      * 日志记录级别Error,当程序运行发生错误时使用
      * @param clazz 错误发生的类
      * @param args 需要打印的数据
@@ -32,12 +43,17 @@ public class Log {
     }
 
     /**
-     * 日志记录级别Debug,当程序运行调试时使用
+     * 日志记录级别<em>Debug</em><br>
+     * 当程序运行调试时使用
      * @param clazz 错误发生的类
      * @param args 需要打印的数据
      */
     public synchronized static void Debug(Class<?> clazz, Object args) {
         log(clazz,"DEBUG",args);
+    }
+
+    public static void Info(Object obj,Object args){
+        Info(obj.getClass(),args);
     }
 
     /**

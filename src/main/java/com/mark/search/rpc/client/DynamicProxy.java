@@ -27,7 +27,8 @@ public class DynamicProxy implements InvocationHandler {
             socket = new Socket();
             socket.connect(address);
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            Log.Error(DynamicProxy.class,"Connection refused (Connection refused)");
         }
     }
 

@@ -2,8 +2,10 @@ package com.mark.search.index.service.impl;
 
 import com.mark.search.annotation.Service;
 import com.mark.search.index.IndexContent;
+import com.mark.search.index.core.MarkIndexFactory;
 import com.mark.search.index.service.SearchService;
 import com.mark.search.index.subject.MarkDoc;
+import com.mark.search.index.subject.MarkIndex;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
@@ -52,6 +54,46 @@ public class SearchServiceImpl implements SearchService {
             e.printStackTrace();
         }
         return new MarkDoc[0];
+    }
+
+    @Override
+    public MarkDoc[] search(List<Integer> indexes, String word) {
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        try {
+            addShouldQuery("synopsis", word, builder);
+            addShouldQuery("title", word, builder);
+            addShouldQuery("content", word, builder);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        BooleanQuery query = builder.build();
+        return search(indexes,query);
+    }
+
+    @Override
+    public MarkDoc[] search(List<Integer> indexes, BooleanQuery query) {
+        List<MarkDoc> markDocs = new ArrayList<>();
+        for(int i:indexes){
+            MarkIndex index = MarkIndexFactory.get(i);
+            if(index == null)
+                continue;
+            try {
+                TopDocs results = index.searcher.search(query,Integer.MAX_VALUE);
+                ScoreDoc[] hits = results.scoreDocs;
+
+                for (ScoreDoc doc : hits) {
+                    MarkDoc markDoc = new MarkDoc();
+                    markDoc.index = i;
+                    markDoc.doc = doc.doc;
+                    markDoc.node = IndexContent.id;
+                    markDoc.score = doc.score;
+                    markDocs.add(markDoc);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return markDocs.toArray(new MarkDoc[0]);
     }
 
     @Override

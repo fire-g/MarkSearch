@@ -14,6 +14,8 @@ public interface WriterService {
      */
     long execute(Object o);
 
+    long execute(int index,Object o);
+
     /**
      * 添加一系列对象到索引
      *

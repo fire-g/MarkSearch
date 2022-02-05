@@ -6,6 +6,10 @@ import java.io.Serializable;
  * @author haotian
  */
 public class MarkDoc implements Serializable {
+    /**
+     * 索引id
+     */
+    public long index;
 
     /**
      * 文档得分

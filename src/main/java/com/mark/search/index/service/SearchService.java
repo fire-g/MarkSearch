@@ -1,7 +1,9 @@
 package com.mark.search.index.service;
 
 import com.mark.search.index.subject.MarkDoc;
+import org.apache.lucene.search.BooleanQuery;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,17 @@ public interface SearchService {
      * @return 所有满足条件的返回值
      */
     MarkDoc[] search(String query);
+
+    /**
+     *
+     * @param indexes 索引id列表
+     * @param query 搜索条件
+     * @return 满足条件的文档
+     */
+    MarkDoc[] search(List<Integer> indexes,String query);
+
+
+    MarkDoc[] search(List<Integer> indexes, BooleanQuery query);
 
     /**
      * 根据图片Hash查找图片

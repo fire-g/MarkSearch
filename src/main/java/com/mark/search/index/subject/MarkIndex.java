@@ -43,10 +43,23 @@ public class MarkIndex {
      */
     private MarkDocModel docModel;
 
-    public void open(){
-
+    /**
+     * 打开索引
+     * @throws IOException 打开索引涉及IO，可能引发IO问题
+     */
+    public void open() throws IOException{
+        this.analyzer = new StandardAnalyzer();
+        this.directory = FSDirectory.open(new File(System.getProperty("user.dir") +
+                File.separator + "data" + File.separator + "i"+File.separator + docModel.id).toPath());
+        initWriter();
+        this.searcher = new IndexSearcher(DirectoryReader.open(directory));
     }
 
+    /**
+     * 创建索引
+     * @param docModel 索引模板
+     * @throws IOException 创建索引设计IO，可能发生IO问题
+     */
     public void create(MarkDocModel docModel) throws IOException {
         this.analyzer = new StandardAnalyzer();
         this.docModel =docModel;

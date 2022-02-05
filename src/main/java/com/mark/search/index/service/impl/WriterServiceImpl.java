@@ -3,9 +3,11 @@ package com.mark.search.index.service.impl;
 import com.mark.search.annotation.Inject;
 import com.mark.search.annotation.Service;
 import com.mark.search.index.annotation.Search;
+import com.mark.search.index.core.MarkIndexFactory;
 import com.mark.search.index.log.LogFactory;
 import com.mark.search.index.log.Logger;
 import com.mark.search.index.service.WriterService;
+import com.mark.search.index.subject.MarkIndex;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -39,6 +41,22 @@ public class WriterServiceImpl implements WriterService {
         try {
             Document document = createDocument(o);
             return add(document);
+        } catch (IllegalAccessException | IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public long execute(int index, Object o) {
+        logger.add2Log(o);
+        try {
+            Document document = createDocument(o);
+            MarkIndex markIndex = MarkIndexFactory.get(index);
+            if(markIndex != null) {
+                markIndex.writer.addDocument(document);
+                return markIndex.writer.commit();
+            }
         } catch (IllegalAccessException | IOException e) {
             e.printStackTrace();
         }

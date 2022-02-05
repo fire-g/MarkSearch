@@ -14,6 +14,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
+ *
  * @author haotian
  */
 public class DynamicProxy implements InvocationHandler {
@@ -26,7 +27,8 @@ public class DynamicProxy implements InvocationHandler {
             socket = new Socket();
             socket.connect(address);
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            Log.Error(DynamicProxy.class,"Connection refused (Connection refused)");
         }
     }
 
@@ -58,7 +60,7 @@ public class DynamicProxy implements InvocationHandler {
         output.writeUTF(((Class<?>) obj).getName());
         output.writeUTF(method.getName());
         if (socket.isClosed()) {
-            Log.log(this.getClass(),"socket is closed");
+            Log.Info(this, "socket is closed");
         }
         output.writeObject(method.getParameterTypes());
         output.writeObject(args);

@@ -46,7 +46,7 @@ public class ServerImpl implements Server {
             return;
         }
         isRunning = true;
-        Log.log(this.getClass(),"服务启动...");
+        Log.Info(this,"服务启动...");
         while (true) {
             Socket socket;
             try {
